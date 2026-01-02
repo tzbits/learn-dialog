@@ -1,5 +1,7 @@
 # Let's Learn: Dialog
 
+Dialog website: <https://linusakesson.net/dialog/>
+
 Here are some dialog-focused micro-games (10-20 commands to reach
 an ending).  Each is based on a prompt, and the idea is to lean
 into a particular mechanic in order to explore it and learn it by
