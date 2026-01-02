@@ -1,0 +1,132 @@
+%% -*- mode: text; fill-column: 70; tab-stops: '(4 8 12 16 20); -*-
+
+(story title)	All the Days of Christmas In This Room
+(story author)	Jason Compton
+
+(additional banner text)	Based on the tzbits thingo
+
+(story release 1)
+
+(story ifid)	86F91919-9441-49ED-9D07-299F6AF8DAB2
+
+(intro)
+
+    This is the room where it happens.  This is the room where all the
+    presents pile up.
+
+    (par)
+    (banner)
+    (try [look])
+
+%% global vars
+
+(global variable (days of christmas 1))
+
+%% rooms
+
+#trophyroom
+(room *)
+(name *)	Christmas Trophy Room
+(look *)
+
+    (par) This is where you take possession of all of your True Love's
+    presents.
+
+    (days of christmas $A)
+    (narrate gift $A)
+    ($A plus 1 into $B)
+    (now) (days of christmas $B)
+
+(narrate gift 1)
+
+    (par) You're extremely important, and worth it, so the partridge
+    in the pear tree is just table stakes.
+
+(narrate gift 2)
+
+    (par) Two turtle doves are here.  You don't recall asking for so
+    many birds.
+
+    (narrate gift 1)
+
+(narrate gift 3)
+
+    (par) Three French hens are here.  This is definitely a more
+    bird-heavy Christmas than you'd expected.
+
+    (narrate gift 2)
+
+(narrate gift 4)
+
+    (par) Four calling birds are here, and not welcome.
+
+    (narrate gift 3)
+
+(narrate gift 5)
+
+    (par) Five golden rings sit in a nice display case.  At least, it
+    was nice, before the turtle doves fouled it.
+
+    (narrate gift 4)
+
+(narrate gift 6)
+
+    (par) Six geese a-laying are here, and it smells like it.
+
+    (narrate gift 5)
+
+(narrate gift 7)
+
+    (par) Given the volume of poultry, you're thinking that you and
+    your True Love need to have a talk.  Because now there are seven
+    swans a-swimming in a very small kiddie pool.
+
+    (narrate gift 6)
+
+(narrate gift 8)
+
+    (par) Eight maids a-milking have dropped by, ink fresh on their
+    five-year milking contracts.  So now you're gonna need to invest
+    in dairy cattle.
+
+    (narrate gift 7)
+
+(narrate gift 9)
+
+    (par) Nine ladies are dancing here, some kind of line dance broken up by
+    the need to dodge the birds.
+
+    (narrate gift 8)
+
+(narrate gift 10)
+
+    (par) Ten lords a-leaping are here.  A couple of them are eyeing
+    the ring case a little too eagerly.
+
+    (narrate gift 9)
+
+(narrate gift 11)
+
+    (par) Eleven pipers are piping here.  At least it's scaring some
+    of the birds.
+
+    (narrate gift 10)
+
+(narrate gift 12)
+
+    (par) Twelve drummers are drumming here.  Between the honking,
+    piping, and now the drumming, you've got a monster headache.
+
+    (narrate gift 11)
+
+(narrate gift 13)
+
+    (par) This has all been lovely but it's just a bit too
+    much.  Boxing Day.  Time to make some returns...
+
+    (game over { ...and have a serious chat with True Love.  })
+
+#player
+(current player *)
+(* is #in #trophyroom)
+(descr *) You are the undisputed King of Christmas Present Getting.
