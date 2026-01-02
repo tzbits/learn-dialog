@@ -32,36 +32,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#table
-
-(name *)	table
-(descr *)	A table. Spartan. Not much else can be said about it.
-(singleton *)
-(* is #in #cottage)
-
-#lantern
-
-(item *)
-(name *)	lantern
-(descr *)
-
-    It's a red metal candle lantern with a white pillar candle
-    inside.
-
-(* is #on #table)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-#front-porch
-
-(room *)
-(name *)	front porch
-(look *)	The front porch faces east where your car is parked.
-
-(from * go #west to #cottage)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 #cottage
 
 (room *)
@@ -72,8 +42,75 @@
     (par) A spartan, yet somehow cozy cottage, despite the Scandi-style
     furnishings.
 
+    (par) There is a table in the center of the room.
+
 (from * go #east to #front-porch)
 (from * go #west to #back-porch)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#table
+
+(name *)	table
+(singleton *)
+(* is #in #cottage)
+
+(descr *)
+
+    A table. Spartan. Not much else can be said about it.
+
+    (if) (#lantern is #on #table) (then)
+
+        (par) There is a candle lantern in the center of the table.
+
+    (endif)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+(global variable (lantern switch on count 0))
+
+(inc lantern)
+    (lantern switch on count $Count)
+    ($Count plus 1 into $NewCount)
+    (now) (lantern switch on count $NewCount)
+
+(lanter is dead)
+    (lantern switch on count 4)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#lantern
+
+(item *)
+(switchable *)
+(name *)	red metal candle lantern
+(dict *)	white candle
+(heads *)	metal candle lantern
+(descr *)
+
+    It's a metal candle lantern. The metal is painted red and shaped
+    into a box that holds a white pillar candle.  This candle is not
+    much of a pillar anymore though: there's hardly any wax or wick
+    left.
+
+(appearance *)
+
+    You notice the candle lantern was left here.
+
+(* is #on #table)
+
+(after [switch on #lantern])
+    (inc lantern)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#front-porch
+
+(room *)
+(name *)	front porch
+(look *)	The front porch faces east where your car is parked.
+
+(from * go #west to #cottage)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
