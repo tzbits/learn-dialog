@@ -1,0 +1,123 @@
+%% -*- mode: text; fill-column: 70; tab-stops: '(4 8 12 16 20); -*-
+
+(story title)   Red Lantern
+(story author)  tzbits
+(story noun)
+
+    a finite light source game
+
+(story ifid)    8B2964B8-02D2-4420-812C-D17926D2B4EA
+
+(style class @status)	height: 1em;
+(style class @italic)	font-style: italic;
+
+(intro)
+
+    (par) Forbidden?  That's where they built their cottage?  Next to
+    a forest that is forbidden?  (span @italic) { Verbotener Wald } as
+    the locals know it.
+
+    (par) With a three night reservation, at EUR 400 a night, a bitter
+    desire nags you to learn what is so forbidden about it.  On the
+    other hand, an inner anxiety reminds you the sun is going down.
+
+    (par)\[PRESS ANY KEY\]
+    (any key)
+    (clear all)
+
+    (banner)
+
+    (status bar  @status) { First Evening }
+    (enter #cottage)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#table
+
+(name *)	table
+(descr *)	A table. Spartan. Not much else can be said about it.
+(singleton *)
+(* is #in #cottage)
+
+#lantern
+
+(item *)
+(name *)	lantern
+(descr *)
+
+    It's a red metal candle lantern with a white pillar candle
+    inside.
+
+(* is #on #table)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#front-porch
+
+(room *)
+(name *)	front porch
+(look *)	The front porch faces east where your car is parked.
+
+(from * go #west to #cottage)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#cottage
+
+(room *)
+(singleton *)
+(name *)	cottage
+(look *)
+
+    (par) A spartan, yet somehow cozy cottage, despite the Scandi-style
+    furnishings.
+
+(from * go #east to #front-porch)
+(from * go #west to #back-porch)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#back-porch
+
+(room *)
+(name *)	back porch
+(look *)
+
+    The back porch faces west where the forbidden forest is.  The
+    inside of the cottage is east.
+
+(from * go #east to #cottage)
+(from * go #west to #forest)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#forest
+
+(room *)
+(singleton *)
+(name *)	forbidden forest
+(look *)
+
+    The forest is its own microclimate under the canopy of trees.
+    It's darker, more humid, breezy, and nature-noisy.
+
+(from * go #east to #porch)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#player
+
+(current player *)
+(descr *)
+    Well, there you are.  On vacation at last.
+
+    (select)
+
+        (par) Kind of lonely.  You recall your mom's reaction when you
+        planned this trip, "Why are you going on vacation alone? When
+        are you going to find a nice girl and get married?"
+
+    (or)
+    (stopping)
+
+(* is #in #cottage)
