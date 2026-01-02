@@ -1,9 +1,9 @@
 # Let's Learn: Dialog
 
-Here are some dialog-focused micro-games (10-20 commands long).
-Each is based on a prompt, and the idea is to lean into a
-particular mechanic in order to explore it and learn it by doing
-something creative with it.
+Here are some dialog-focused micro-games (10-20 commands to reach
+an ending).  Each is based on a prompt, and the idea is to lean
+into a particular mechanic in order to explore it and learn it by
+doing something creative with it.
 
 I encourage you to implement something of your own based on each
 prompt, compare it to what's here, and if you'd like to share
@@ -30,8 +30,9 @@ cold, etc.).
 
 Examples:
 
-* [crisis.dg](./crisis.dg): Meaning Crisis, an adaptation of The
-  Little Match Girl by Hans Christian Andersen, by tzbits.
+- [crisis.dg](./crisis.dg) \[[Play  Now](https://tzbits.com/dialog/crisis/)\]:
+  Meaning Crisis, an adaptation of The Little Match Girl by Hans
+  Christian Andersen, by tzbits.
 
 ## 2. The Finite Light Source Game
 
@@ -51,4 +52,4 @@ Examples:
 
 ### 3. More to come
 
-\-- Suggestions welcome \--.
+\-- Suggestions welcome \--
