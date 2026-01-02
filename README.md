@@ -34,8 +34,9 @@ Examples:
   Meaning Crisis, an adaptation of The Little Match Girl by Hans
   Christian Andersen, by tzbits.
 
-- [christmas.dg](./christmas.dg): All the Days of Christmas In
-  This Room, by Jason Compton
+- [christmas.dg](./christmas.dg)
+  \[[discussion]\(https://intfiction.org/t/lets-learn-dialog/78444/10):
+  All the Days of Christmas In This Room, by Jason Compton
 
 
 ## 2. The Finite Light Source Game
