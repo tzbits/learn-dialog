@@ -2,6 +2,8 @@
 
 Dialog website: <https://linusakesson.net/dialog/>
 
+Searchable manual: <https://dialog-if.github.io/manual/dialog/0m03>
+
 Here are some dialog-focused micro-games (10-20 commands to reach
 an ending).  Each is based on a prompt, and the idea is to lean
 into a particular mechanic in order to explore it and learn it by
