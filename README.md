@@ -41,6 +41,10 @@ Examples:
   All the Days of Christmas In This Room, by Jason Compton, with
   edits by tzbits to count down the days using recursion.
 
+- [snowable.dg](./snowable.dg)
+  \[[discussion](https://intfiction.org/t/lets-learn-dialog/78444/16)\]:
+  Snowable by Adam Biltcliffe
+
 
 ## 2. The Finite Light Source Game
 

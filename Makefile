@@ -1,5 +1,5 @@
 # List your story names here
-STORIES = crisis christmas lantern
+STORIES = crisis christmas snowable lantern
 STDLIB = stdlib.dg
 
 # Generate the list of all targets based on the names above

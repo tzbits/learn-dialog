@@ -1,0 +1,165 @@
+(story title)	Snowable
+(story author)	Adam Biltcliffe
+(story ifid)	BB492398-1005-4460-BB41-A3D3A87B930A
+
+(intro)
+	(try [look])
+
+(current player #player)
+(#player is #in #office)
+
+#office
+(room *)
+(name *) Office
+(look *)
+    (collect $F)
+        *($F is #in #office)
+        ~(item $F)
+        ~($F = #player)
+    (into $Furniture)
+    (if) (nonempty $Furniture) (then)
+        Your office contains (a $Furniture).
+    (else)
+        Your office is devoid of furniture.
+    (endif)
+    (collect $Obj)
+        *($Obj is #on #desk)
+    (into $DeskThings)
+    (if) (nonempty $DeskThings) (then)
+        On the desk (is $DeskThings) (a $DeskThings).
+    (endif)
+    Outside the window, you can see the snow.
+    (snow level is $S)
+    {
+        ($S > 0)
+        There are
+        (if) ($S < 3) (then) flecks of snow
+        (elseif) ($S < 5) (then) drifts of snow
+        (elseif) ($S < 7) (then) large piles of snow
+        (elseif) ($S < 9) (then) great snowy hills
+        (else) vast mountains of snow (endif)
+        inside the office as well.
+        (or)
+    }
+#cabinet
+(name *) filing cabinet
+(openable *)
+(container *)
+(* is #in #office)
+(snowable *)
+
+#folder
+(name *) manila folder
+(item *)
+(* is #in #cabinet)
+(snowable *)
+
+#phone
+(name *) mobile phone
+(item *)
+(* is #on #desk)
+(snowable *)
+
+#book
+(name *) paperback novel
+(dict *) book
+(item *)
+(* is #on #desk)
+(snowable *)
+
+#satchel
+(name *) satchel
+(item *)
+(container *)
+(* is #on #desk)
+(snowable *)
+
+#calculator
+(name *) scientific calculator
+(item *)
+(* is #in #satchel)
+(snowable *)
+
+#cooler
+(name *) water cooler
+(* is #in #office)
+(snowable *)
+
+#ball
+(name *) basketball
+(dict *) basket ball
+(item *)
+(* is #in #office)
+(appearance *) A basketball lies on the floor.
+(snowable *)
+
+#chair
+(name *) desk chair
+(heads *) chair
+(* is #in #office)
+(snowable *)
+
+#desk
+(name *) desk
+(heads *) desk
+(supporter *)
+(* is #in #office)
+(snowable *)
+
+%% Give all the portable items their default appearance
+($Obj is handled)
+    (item $Obj)
+
+(can crumble $Obj)
+    (snowable $Obj)
+    ~($Obj is nowhere)
+    %% Don't crumble things inside closed containers
+    (if) ($Obj is #in $Parent) ~(room $Parent) (then)
+        (open $Parent)
+    (endif)
+
+(choose crumbling item $Obj)
+    (collect $Candidate)
+        *($Candidate is in scope)
+        (can crumble $Candidate)
+    (into $List)
+    (length of $List into $NMax)
+    (random from 1 to $NMax into $N)
+    (nth $List $N $Obj)
+
+(on every tick)
+    (choose crumbling item $Obj)
+    (par) (The $Obj) gives a soft sigh and falls apart into a pile of powdery white snow.
+    (collect $Child)
+        *($Child has parent $Obj)
+    (into $Children)
+    (if) (nonempty $Children) (then)
+        ($Obj has parent $Parent)
+        (if) ($Parent = #player) (then)
+            ($NewParent = #office)
+        (else)
+            ($NewParent = $Parent)
+        (endif)
+        ($Obj has relation $Rel)
+        (The $Children) fall(s $Children) onto
+        (if) (current room $NewParent) (then)
+            the floor
+        (else)
+            (the $NewParent)
+        (endif).
+        (exhaust)
+        {
+            *($Child is one of $Children)
+            (now) ($Child is $Rel $NewParent)
+        }
+    (endif)
+    (now) ($Obj is nowhere)
+    (if) (snow level is 10) (then)
+        (game over { SNOW })
+    (endif)
+
+(snow level is $N)
+    (accumulate 1)
+        *(snowable $Obj)
+        ($Obj is nowhere)
+    (into $N)
