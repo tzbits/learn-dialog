@@ -38,7 +38,8 @@ Examples:
 
 - [christmas.dg](./christmas.dg)
   \[[discussion](https://intfiction.org/t/lets-learn-dialog/78444/10)\]:
-  All the Days of Christmas In This Room, by Jason Compton
+  All the Days of Christmas In This Room, by Jason Compton, with
+  edits by tzbits to count down the days using recursion.
 
 
 ## 2. The Finite Light Source Game
