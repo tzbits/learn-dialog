@@ -34,35 +34,38 @@ cold, etc.).
 
 Examples:
 
-- [crisis.dg](./crisis.dg) \[[Play  Now](https://tzbits.com/dialog/crisis/)\]:
+- [crisis.dg](./crisis.dg)
+  \[[Play Now](https://tzbits.com/dialog/crisis/)\]:
   Meaning Crisis, an adaptation of The Little Match Girl by Hans
   Christian Andersen, by tzbits.
 
 - [christmas.dg](./christmas.dg)
+  \[[Play Now](https://tzbits.com/dialog/christmas/)\]
   \[[discussion](https://intfiction.org/t/lets-learn-dialog/78444/10)\]:
   All the Days of Christmas In This Room, by Jason Compton, with
   edits by tzbits to count down the days using recursion.
 
 - [snowable.dg](./snowable.dg)
+  \[[Play Now](https://tzbits.com/dialog/snowable/)\]
   \[[discussion](https://intfiction.org/t/lets-learn-dialog/78444/16)\]:
   Snowable by Adam Biltcliffe
 
 
-## 2. The Finite Light Source Game
+## 2. The Finite Switchable Game
 
-Create a game where a finite light source eventually goes dark.
+Create a game where a switchable item can only be switched on a
+limited number of times.
 
 For example, a candle could be `(switchable $)` and `(item $)`,
 and a global variable or a tick counter can track how many turns
-the candle has been `(on $)` and a `(prevent [switch on #candle])`
-can prevent the player from switching it back on by overriding
-`(prevent [switch on #candle])`.  Note the library uses the
-`($ provides light)` predicate to determine if a room is dark or
-visible.
+the candle has been on or how many times it's been switched on,
+and a `(prevent [switch on #candle])` can check the count.
 
 Examples:
 
-* lantern.dg: WIP
+* [lantern.dg](./lantern.dg)
+  \[[Play  Now](https://tzbits.com/dialog/lantern/)\]:
+  Candle Lantern by tzbits.
 
 ### 3. More to come
 
