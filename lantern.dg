@@ -14,12 +14,15 @@
 (intro)
 
     (par) Forbidden?  That's where they built their cottage?  Next to
-    a forest that is forbidden?  (span @italic) { Verbotener Wald } as
-    the locals know it.
+    a forest that is forbidden?
 
-    (par) With a three night reservation, at EUR 400 a night, a bitter
-    desire nags you to learn what is so forbidden about it.  On the
-    other hand, an inner anxiety reminds you the sun is going down.
+    (par) Mallorca, or Malta, or Masca, or ... here.  Why did you pick
+    this cottage, here.  A deal like EUR 250 a night had something to
+    do with it.
+
+    (par) Now a bitter desire nags you to learn what is so forbidden
+    about "Der Verbotene Wald".  A cautious anxiety, however, pulls
+    you in another direction, reminding you the sun is about to set.
 
     (par)\[PRESS ANY KEY\]
     (any key)
@@ -27,7 +30,6 @@
 
     (banner)
 
-    (status bar  @status) { First Evening }
     (enter #cottage)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,8 +41,9 @@
 (name *)	cottage
 (look *)
 
-    (par) A spartan, yet somehow cozy cottage, despite the Scandi-style
-    furnishings.
+    (par) A spartan, yet somehow cozy cottage, despite the
+    Scandi-style furnishings. They should have leaned more Scandi
+    Boho. Or maybe New Nordic would have been better...
 
     (par) There is a table in the center of the room.
 
@@ -57,7 +60,7 @@
 
 (descr *)
 
-    A table. Spartan. Not much else can be said about it.
+    A table. Spartan.  Spartan is good.  No, it's too spartan.
 
     (if) (#lantern is #on #table) (then)
 
@@ -67,15 +70,26 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-(global variable (lantern switch on count 0))
+(global variable (match count 3))
 
-(inc lantern)
-    (lantern switch on count $Count)
-    ($Count plus 1 into $NewCount)
-    (now) (lantern switch on count $NewCount)
+(dec match count)
+    (match count $Count)
+    ($Count minus 1 into $NewCount)
+    (now) (match count $NewCount)
 
-(lanter is dead)
-    (lantern switch on count 4)
+(no more matches)
+    (match count 0)
+
+(say match count)
+    (match count $N)
+    The small drawer under the candle has
+    (if) ($N = 0) (then)
+        no matches left in it.
+    (elseif) ($N = 1) (then)
+        one match in it.
+    (else)
+        $N matches in it.
+    (endif)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -86,21 +100,60 @@
 (name *)	red metal candle lantern
 (dict *)	white candle
 (heads *)	metal candle lantern
+
+(say #lantern state)
+    (if) (#lantern is off) (then)
+
+        The candle inside is unlit.  There's little wick or wax left.
+
+    (else)
+
+        The tiny flame in the box flickers, filling your environment
+        with dancing shadows.  Like your New Year's resolutions, it
+        looks ready to quit at the slightest gust.
+
+    (endif)
+
 (descr *)
 
-    It's a metal candle lantern. The metal is painted red and shaped
-    into a box that holds a white pillar candle.  This candle is not
-    much of a pillar anymore though: there's hardly any wax or wick
-    left.
+    It's a metal candle lantern.
+
+    (select)
+
+        (par) The metal outline is red and the glass box holds a white
+        pillar candle.  The candle is not much of a pillar anymore
+        though.  More like a molehill.
+
+        (or)
+
+    (stopping)
+
+    (par) (say #lantern state)
+
+    (par) (if) (#lantern is off) (then) (say match count) (endif)
+
 
 (appearance *)
 
-    You notice the candle lantern was left here.
+    You notice the candle lantern was left here.  (say #lantern state)
 
 (* is #on #table)
 
+(prevent [switch on #lantern])
+    (no more matches)
+    You don't have any more matches.
+
 (after [switch on #lantern])
-    (inc lantern)
+    (dec match count)
+
+(narrate switching on #lantern)
+
+    (par) Taking a match from the tiny drawer, you strike it, and you
+    carefully hold it to the wick until the flame comes to life.
+
+(narrate switching off #lantern)
+
+    (par) You blow out the candle.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -123,8 +176,8 @@
     The back porch faces west where the forbidden forest is.  The
     inside of the cottage is east.
 
-(from * go #east to #cottage)
 (from * go #west to #forest)
+(from * go #east to #cottage)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -138,7 +191,7 @@
     The forest is its own microclimate under the canopy of trees.
     It's darker, more humid, breezy, and nature-noisy.
 
-(from * go #east to #porch)
+(from * go #east to #back-porch)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -150,11 +203,48 @@
 
     (select)
 
-        (par) Kind of lonely.  You recall your mom's reaction when you
-        planned this trip, "Why are you going on vacation alone? When
-        are you going to find a nice girl and get married?"
+        You are wearing a black T-shirt: part of your minimalist
+        phase.  Last year it was Gorpcore.  You told everyone you were
+        going to thru-hike the PCT, and then never left the city
+        limits.
 
     (or)
+
+        You look at your watch.  It's the one you bought to train for
+        that marathon you never ran.  The sun has definitely set by
+        now.
+
+    (or)
+
+        But you are alone.  Should have invited Irna along. Or
+        Niki. Or Annabel.
+
     (stopping)
 
 (* is #in #cottage)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+(grammar [light [object]] for [switch on $])
+(grammar [blow out [object]] for [switch off $])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+(narrate leaving $Room $Dir)
+    (if) ~(#lantern is off) (#lantern is #heldby #player) (then)
+        (now) (#lantern is off)
+
+        (par) As you walk (name $Dir), a puff of wind blows out the
+        candle.
+
+        (span @italic) {
+
+            Should have gone to (select) Mallorca (or) Malta (or)
+            Masca (stopping).
+
+        }
+
+    (else)
+        You walk (name $Dir).
+    (endif)
