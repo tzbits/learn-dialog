@@ -1,6 +1,6 @@
 %% -*- mode: text; fill-column: 70; tab-stops: '(4 8 12 16 20); -*-
 
-(story title)   Red Lantern
+(story title)   Candle Lantern
 (story author)  tzbits
 (story noun)
 
@@ -16,69 +16,28 @@
     (par) Forbidden?  That's where they built their cottage?  Next to
     a forest that is forbidden?
 
-    (par) Mallorca, or Malta, or Masca, or ... here.  Why did you pick
-    this cottage, here.  A deal like EUR 250 a night had something to
-    do with it.
+    (par) Mallorca, or Malta, or Masca, or... here.  This cottage was
+    your pick.  A EUR 250 per night deal had something to do with it.
 
-    (par) Now a bitter desire nags you to learn what is so forbidden
-    about "Der Verbotene Wald".  A cautious anxiety, however, pulls
-    you in another direction, reminding you the sun is about to set.
+    (par) Your curiosity asks, what is so forbidden about "Der
+    Verbotene Wald"?  Your anxiety, however, pulls you in another
+    direction, reminding you the sun just set.
 
-    (par)\[PRESS ANY KEY\]
-    (any key)
+    (par) \[PRESS ANY KEY\] (any key)
     (clear all)
 
     (banner)
-
     (enter #cottage)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-#cottage
-
-(room *)
-(singleton *)
-(name *)	cottage
-(look *)
-
-    (par) A spartan, yet somehow cozy cottage, despite the
-    Scandi-style furnishings. They should have leaned more Scandi
-    Boho. Or maybe New Nordic would have been better...
-
-    (par) There is a table in the center of the room.
-
-(from * go #east to #front-porch)
-(from * go #west to #back-porch)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-#table
-
-(name *)	table
-(singleton *)
-(* is #in #cottage)
-
-(descr *)
-
-    A table. Spartan.  Spartan is good.  No, it's too spartan.
-
-    (if) (#lantern is #on #table) (then)
-
-        (par) There is a candle lantern in the center of the table.
-
-    (endif)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (global variable (match count 3))
 
 (dec match count)
-    (match count $Count)
-    ($Count minus 1 into $NewCount)
-    (now) (match count $NewCount)
-
-(no more matches)
-    (match count 0)
+    (match count $N)
+    ($N minus 1 into $Np1)
+    (now) (match count $Np1)
 
 (say match count)
     (match count $N)
@@ -91,79 +50,132 @@
         $N matches in it.
     (endif)
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#front-porch
+
+(from * go #west to #cottage)
+
+(room *)
+(name *)	front porch
+(look *)	The front porch faces east where your car is parked.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#cottage
+
+(from * go #east to #front-porch)
+(from * go #west to #back-porch)
+
+(room *)
+(singleton *)
+(name *)	cottage
+(look *)
+
+    (par) A spartan, yet somehow cozy cottage, despite the
+    Scandi-style furnishings. They should have leaned more
+    Scandi-Boho. Or maybe New Nordic would have been better...
+
+    (par) The front porch is east.  The back porch is west.
+
+    (par) There is a table in the center of the room.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#table
+
+(* is #in #cottage)
+(name *)	table
+(descr *)
+
+    A table. Spartan.  Spartan is good.  No, it's too spartan.
+
+    (if) (#lantern is #on #table) (then)
+
+        (par) There is a candle lantern in the center of the table.
+
+    (endif)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #lantern
 
 (item *)
-(switchable *)
-(name *)	red metal candle lantern
+(* is #on #table)
+
+(name *)	metal candle lantern
 (dict *)	white candle
+(dict *)	matches
 (heads *)	metal candle lantern
+
+%% If wavering, it blows out when moving from room to room.
+(wavering *)
+
+(* provides light)
+    (* is on)
+
+(switchable *)
+
+(after [switch on #lantern])
+    (dec match count)
+
+(prevent [switch on #lantern])
+    (match count 0)
+    You don't have any more matches.
+
+(prevent [switch off #lantern])
+    ~(wavering #lanter)
+
+    The flame is burning strong and constant.  It seems nothing will
+    put it out.
 
 (say #lantern state)
     (if) (#lantern is off) (then)
 
-        The candle inside is unlit.  There's little wick or wax left.
+        The candle inside is unlit. (say match count)
 
     (else)
 
-        The tiny flame in the box flickers, filling your environment
-        with dancing shadows.  Like your New Year's resolutions, it
-        looks ready to quit at the slightest gust.
+        The tiny flame in the box flickers.  Like your New Year's
+        resolutions, it looks ready to quit at the slightest gust.
 
     (endif)
 
-(descr *)
+(appearance *)
+    You notice the candle lantern was left here.  (say #lantern state)
+
+(descr #lantern)
+    (wavering #lantern)
 
     It's a metal candle lantern.
 
     (select)
 
-        (par) The metal outline is red and the glass box holds a white
-        pillar candle.  The candle is not much of a pillar anymore
-        though.  More like a molehill.
+        (par) The metal edged glass box has a white pillar candle
+        inside.  But it's more like a molehill than a pillar now.
 
         (or)
-
     (stopping)
 
     (par) (say #lantern state)
 
-    (par) (if) (#lantern is off) (then) (say match count) (endif)
+(descr #lantern)
+    ~(wavering #lantern)
 
+    The white pillar candle in the lantern looks new and hardly used.
 
-(appearance *)
+    (par) It burns with a bright constant flame.
 
-    You notice the candle lantern was left here.  (say #lantern state)
-
-(* is #on #table)
-
-(prevent [switch on #lantern])
-    (no more matches)
-    You don't have any more matches.
-
-(after [switch on #lantern])
-    (dec match count)
+(narrate switching off #lantern)
+    (par) You blow out the candle.
 
 (narrate switching on #lantern)
 
     (par) Taking a match from the tiny drawer, you strike it, and you
     carefully hold it to the wick until the flame comes to life.
 
-(narrate switching off #lantern)
-
-    (par) You blow out the candle.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-#front-porch
-
-(room *)
-(name *)	front porch
-(look *)	The front porch faces east where your car is parked.
-
-(from * go #west to #cottage)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -179,19 +191,82 @@
 (from * go #west to #forest)
 (from * go #east to #cottage)
 
+(after [switch on #lantern])
+    (#player is #in #back-porch)
+
+    (par) You hold up the lantern and look toward the forest.  A faint
+    light appears deep within, across from you, mirroring you.
+
+    (now) ~(fairy is invisible)
+
+(after [switch off #lantern])
+    (#player is #in #back-porch)
+    (now) (fairy is invisible)
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #forest
 
+(from * go #south to #forest)
+(from * go #north to #forest)
+(from * go #west to #forest)
+(from * go #east to #back-porch)
+    ~(#lantern is off) (or) ~(match count 0)
+(from * go #east to #forest)
+
 (room *)
-(singleton *)
 (name *)	forbidden forest
+(inherently dark *)
+(fairy is invisible)
+
 (look *)
 
-    The forest is its own microclimate under the canopy of trees.
-    It's darker, more humid, breezy, and nature-noisy.
+    (if) (fairy is invisible) (then)
 
-(from * go #east to #back-porch)
+        (par) The forest is its own microclimate under the canopy of
+        trees.  It's darker, more humid, breezy, and nature-noisy:
+        not a place you want to be after dark.
+
+    (else)
+
+        You wander into the forest toward the distant faint light.  It
+        seems to run away from you.  Then it stops, then it runs away.
+
+        (par) Then it stops.  You walk straight up to it.  A flying
+        sparkle-eyed fairy darts above you.  Then below you.  Then she
+        freezes in front of your nose, while you look at her
+        cross-eyed.  She kisses your cheek, taps your lantern, then
+        disappears.
+
+        (now) ~(wavering #lantern)
+        (now) (fairy is invisible)
+
+    (endif)
+
+(#forest turn count 0)
+(on every tick in #forest)
+    (#forest turn count $N)
+    ($N plus 1 into $Np1)
+    (now) (#forest turn count $Np1)
+    (if) ($Np1 < 3) (then)
+        (select)
+            (par) Careful. You are likely to be eaten by a grue here.
+            (or)
+            (par) You hear strange sounds.
+            (or)
+            (par) Something is out there.
+            (or)
+        (stopping)
+    (else)
+
+        (par) "Oh, no! You have walked into the slavering fangs of a
+        lurking grue!
+
+        (game over { Game Over. })
+
+    (endif)
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -203,48 +278,68 @@
 
     (select)
 
-        You are wearing a black T-shirt: part of your minimalist
+        (par) You recall your mom's reaction when you planned this
+        trip, "Why are you vacationing alone? You're 28.  When are you
+        going to find a nice girl and get married?"  (span @italic)
+        {She's proably right.}
+
+        (par) (span @italic) {Should call Ina.  Or Niki.  Or Annabel.}
+
+    (or)
+
+        (par) You are wearing a black T-shirt: part of your minimalist
         phase.  Last year it was Gorpcore.  You told everyone you were
         going to thru-hike the PCT, and then never left the city
         limits.
 
     (or)
 
-        You look at your watch.  It's the one you bought to train for
-        that marathon you never ran.  The sun has definitely set by
-        now.
+        (par) You look at your watch.  It's the one you bought to
+        train for that marathon you never ran.
 
     (or)
-
-        But you are alone.  Should have invited Irna along. Or
-        Niki. Or Annabel.
-
     (stopping)
 
-(* is #in #cottage)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+(narrate leaving #back-porch $Dir)
+    ~(fairy is invisible) (#lantern is on)
+    You walk (name $Dir) into the forest.
+
+(narrate leaving $ $Dir)
+    (if) (wavering #lantern)
+        (#lantern is on)
+        (#lantern is #heldby #player) (then)
+
+        (now) (#lantern is off)
+
+        (par) As you walk (name $Dir), a puff of wind blows out the
+        candle.
+
+        (par) (span @italic) {
+
+            Should have gone to (select) Mallorca (or) Malta (or)
+            Masca (stopping),
+
+        } you grumble.
+
+    (else)
+        You walk (name $Dir).
+    (endif)
+
+(narrate entering #cottage)
+    ~(wavering #lantern)
+
+    (par) You return to the cottage with a steadfastness you've never
+    felt before.  You are eager to get an early start tomorrow.  And
+    carry out everything planned for this trip.  And carry out your
+    resolutions.  And give Ina a call.
+
+    (game over { Yes.  Definitely Ina. })
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (grammar [light [object]] for [switch on $])
 (grammar [blow out [object]] for [switch off $])
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-(narrate leaving $Room $Dir)
-    (if) ~(#lantern is off) (#lantern is #heldby #player) (then)
-        (now) (#lantern is off)
-
-        (par) As you walk (name $Dir), a puff of wind blows out the
-        candle.
-
-        (span @italic) {
-
-            Should have gone to (select) Mallorca (or) Malta (or)
-            Masca (stopping).
-
-        }
-
-    (else)
-        You walk (name $Dir).
-    (endif)
