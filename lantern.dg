@@ -62,8 +62,9 @@
     A cozy cottage with a table in the center.
 
     (select) (par) (span @italic){Cozy despite the Scandi-style
-    furnishings.  They should have leaned more Scandi-Boho.  Or maybe
-    New Nordic would have been better, or ...stop it.} (or) (stopping)
+    furnishings.  They should have leaned more Scandi-Boho, or maybe
+    New Nordic would have been better, or maybe ... oh stop it.} (or)
+    (stopping)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -85,11 +86,19 @@
 (name *)	metal candle lantern
 (dict *)	white candle
 (dict *)	matches
+(dict *)	match
 (heads *)	metal candle lantern
 (switchable *)
 (wavering *)
 (* provides light)
     (* is on)
+
+(before $)
+    (last command was $Words)
+    ($Words contains one of [match matches])
+    ~($Words contains one of [switch light])
+    (par) The matches can't be handled apart from the lantern.
+    (stop)
 
 (say match count)
     (match count $N)
@@ -116,7 +125,7 @@
     You blow out the candle.
 (narrate switching on *)
     (dec match count)
-    (par) You strike a match and light the wick.
+    (par) You strike a match and light the candle wick.
 
 (prevent [switch on *])
     (match count 0) You don't have any more matches.
@@ -266,11 +275,19 @@
 
     (game over { Yes.  Definitely Ina. })
 
-(grammar [light [object]] for [switch on $])
-(grammar [blow out [object]] for [switch off $])
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #player
 
 (current player *)
 (descr *)
     Well, there you are.  On vacation at last.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+(grammar [light [object]] for [switch on $])
+(grammar [blow out [object]] for [switch off $])
+
+(grammar [light [object] with [match/matches]] for [switch on $])
+(grammar [switch on [object] with [match/matches]] for [switch on $])
+(grammar [switch [object] on with [match/matches]] for [switch on $])
