@@ -6,7 +6,7 @@
 (story author)	tzbits
 (story noun)	a let's learn dialog \(attracts \*\) game
 
-(story ifid)	8B2964B8-02D2-4420-812C-D17926D2B4EA
+(story ifid)	B4DA6144-FD65-473B-BAF9-F58FACD5D77F
 
 (style class @status)	height: 1em;
 (style class @italic)	font-style: italic;
