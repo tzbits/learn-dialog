@@ -79,7 +79,9 @@ the object to be manually moved between rooms.
 
 Examples:
 
-* [The Last Joybooth Shift](https://intfiction.org/t/adjacent-to-let-s-learn-dialog-finite-switchable-game/78518)
+* [The Last Joybooth
+  Shift](https://intfiction.org/t/adjacent-to-let-s-learn-dialog-finite-switchable-game/78518),
+  by Jason Compton
 
 ## 4. More to come
 
