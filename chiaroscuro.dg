@@ -1,0 +1,448 @@
+%% -*- mode: text; fill-column: 70; tab-stops: '(4 8 12 16 20); -*-
+
+(chamber)	Chiaroscuro Chamber
+
+(story title)	The (chamber)
+(story author)	tzbits
+(story noun)	a let's learn dialog \(attracts \*\) game
+
+(story ifid)	8B2964B8-02D2-4420-812C-D17926D2B4EA
+
+(style class @status)	height: 1em;
+(style class @italic)	font-style: italic;
+
+(intro)
+
+    (par) The sign said "Do Not Enter", and you had to enter didn't
+    you?  Well, now you somehow got yourself locked in here.
+
+    (par) It's quite dark with only a little light coming through
+    various crevices.  A weird mix of curiosity and panic sets in as
+    you think, "How am I going to get out of this room and back to the
+    public part of the museum?"
+
+    (par) \[PRESS ANY KEY\] (any key)
+    (clear all)
+    (banner)
+
+    (enter #chamber-s)
+
+
+(skeleton frowning)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#chamber-nw
+
+(room *)
+(name *)	(chamber) Northwest Corner
+(look *)	This is one of the darkest parts of the room.
+
+(from * go #east to #chamber-n)
+(from * go #south to #chamber-sw)
+(from * go #southeast to #chamber-s)
+
+#athanor
+(* is #in #chamber-nw)
+(switchable *)
+(name *)	athanor
+(descr *)
+
+    (par) It's an alchemy furnace used for maintaining constant heat.
+
+    (par) This modern-day reproduction looks easier to turn on than
+    an original.
+
+(appearance *)
+
+    There is (if) (#athanor is on) (then) a glowing (else) an (endif)
+    athanor here.
+
+    (if) (wall position #painting #chamber-nw)
+    (then) The painting is hanging here too.
+    (endif)
+
+(narrate switching on *)
+
+    (par) After a low whoosh sound, it slowly fires up.  Orange light
+    escapes from its seams, producing shadows throughout the room.
+
+    (now) ~(skeleton frowning)
+
+(narrate switching off *)
+
+    You switch it off and the room becomes considerably darker.
+
+    (now) (skeleton frowning)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#chamber-n
+
+(room *)
+(name *)	(chamber) North
+(look *)
+    This is the side of the room directly north of the entrance.
+
+    (if) (wall position #painting *)
+    (then) (par) The painting is hanging here.
+    (endif)
+
+(from * go #west to #chamber-nw)
+(from * go #east to #chamber-ne)
+(from * go #southwest to #chamber-sw)
+(from * go #south to #chamber-s)
+(from * go #southeast to #chamber-se)
+
+#sistrum
+
+(name *) 	sistrum
+(item *)
+(* is #in #chamber-n)
+(* is handled)
+(descr *)
+
+    A musical instrument of ancient Egypt.  It looks kind of like a
+    cross between a baby rattle and a torture device.
+
+(grammar [play [object]] for [wave $])
+
+(instead of [wave #sistrum])
+
+    You wave it around.  It makes a musical clank.
+
+    (now) (skeleton frowning)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#chamber-ne
+
+(room *)
+(name *)	(chamber) Northeast Corner
+
+(lighting right)
+    (current room #chamber-ne)
+    (wall position #painting #chamber-ne)
+    (#athanor is on)
+    ~(#lamp is on)
+
+(look *)
+    This is the far right corner from the entrance.
+
+    There is a brass lever high up on the wall in the (if) (lever
+    pulled) (then) down (else) up (endif) position.
+
+    (if) (wall position #painting *)
+    (then) (par) The painting is hanging here too.
+    (endif)
+
+(from * go #west to #chamber-n)
+(from * go #southwest to #chamber-s)
+(from * go #south to #chamber-se)
+
+#lever
+(name *) brass lever
+(heads *) lever
+(* is #in #chamber-ne)
+(prevent [pull #lever])
+    (if) (current room #chamber-ne) (then)
+        (par) It is far too high for you to reach.
+    (endif)
+    (now) (skeleton frowning)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#chamber-se
+
+(room *)
+(name *)	(chamber) Southeast Corner
+(look *)
+    This area is to the right of where you came in.
+
+(from * go #northwest to #chamber-n)
+(from * go #north to #chamber-ne)
+(from * go #west to #chamber-s)
+
+#fumitory
+(* is handled)
+(edible *)
+(item *)
+(name *)	fumitory
+(* is #in #chamber-se)
+(descr *)
+
+    It's a bundle of herbs, mainly consisting of a herbaceous annual
+    flowering plant in the poppy family.
+
+(instead of [smell *])
+
+    It smells acrid and smoky.
+
+(after [eat/taste *])
+
+    (par) You may experience abdominal distention, flatulence, nausea,
+    increased or decreased appetite, stomach pain, and diarrhea.
+
+    (now) (skeleton frowning)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#chamber-s
+
+(room *)
+(name *)	(chamber) South
+(look *)
+    (select)
+
+        (par) A large (a #painting) hangs by two cables from a picture
+        rail on the north wall directly in front of you: it's a
+        portrait of a ghastly figure.  Is this something historic? Or
+        just an image from some morbid tenebrist's imagination?
+        Unclear.
+
+        (or)
+
+        This is the south side of the room where you came in.
+
+    (stopping)
+
+(from * go #northwest to #chamber-nw)
+(from * go #north to #chamber-n)
+(from * go #northeast to #chamber-ne)
+(from * go #east to #chamber-se)
+(from * go #west to #chamber-sw)
+
+(narrate failing to leave #chamber-s #south)
+
+    (if) (lever pulled)
+    (then)
+
+        (par) You notice the way out is no longer obstructed, and
+        return to the public part of the museum, happy to return to
+        the more mundane parts of the collection.
+
+        (game over { You win })
+    (endif)
+
+    You try, but fail to get out.  Somehow you got yourself locked in
+    here.
+
+    (now) (skeleton frowning)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#chamber-sw
+
+(room *)
+(name *)	(chamber) Southwest Corner
+(look *)	This area is to the left of where you came in.
+
+(from * go #north to #chamber-nw)
+(from * go #northeast to #chamber-n)
+(from * go #east to #chamber-s)
+
+#lamp
+(item *)
+(switchable *)
+(name *) glass lamp
+(heads *) lamp
+(* is handled)
+(* is #in #chamber-sw)
+
+(narrate switching on #lamp)
+    You switch it on and it produces a lot of light.
+    (now) (skeleton frowning)
+
+(narrate switching off #lamp)
+    You switch off the glass lamp.
+    (now) ~(skeleton frowning)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#archduke
+(name *)
+
+
+#painting
+(wall position #painting #chamber-n)
+(name *)	painting
+(* is #in #chamber-n)
+(#chamber-nw/#chamber-n/#chamber-ne/#chamber-sw/#chamber-s/#chamber-se attracts *)
+
+(item *)
+(appearance *)
+
+(the archduke)
+    the (if) (skeleton seen) (then) skeleton (else) archduke (endif)
+
+(The archduke)
+    (uppercase) (the archduke)
+
+(prevent [take #painting])
+    You are not an art thief.
+
+(say painting location)
+
+    (if) (wall position #painting #chamber-nw) (then)
+        hanging in the northwest section of the wall
+    (elseif) (wall position #painting #chamber-ne) (then)
+        hanging in the northeast section of the wall
+    (else)
+        hanging in the center of the wall
+    (endif)
+
+(descr #painting)
+    (lighting right) ~(lever pulled)
+
+    (clear all)
+
+    (par) To your shock, (the archduke)’s painted hand reaches out of
+    the canvas and pulls the physical lever on the wall.
+
+    (now) (lever pulled)
+    (par) \[PRESS ANY KEY\] (any key)
+
+(descr *)
+    (select)
+
+        (par) A bronze plate below the painting (say painting
+        location) says, "Archduke Oubliette the Ossified, an exquisite
+        chiaroscuro."
+
+        (now) (painting seen)
+
+        (or)
+
+        (par) The mannerist painting, (say painting location), depicts
+        a skeleton wearing an incredibly lush, powdered periwig and a
+        green silk banyan.  The figure is a good 11 heads tall instead
+        of the typical 8.
+
+        (now) (skeleton seen)
+
+        (or)
+
+        (par) The painting, (say painting location), plays tricks with
+        the light.
+
+        (par) The contrast between the whitest bone in the foreground
+        pops against the blackest void in the background.
+
+        (or)
+
+        You notice the cables aren't fixed to the picture rail and it
+        is possible to slide the painting to the left or right.
+
+    (stopping)
+
+(pushable *)
+(grammar [pull/slide [single] [direction]] for [push $ $])
+(grammar [push [single] left] for [push $ #west])
+(grammar [push [single] right] for [push $ #east])
+
+(prevent [push * $Dir])
+    ~($Dir is one of [#west #east])
+    The painting only slides east/west.
+
+(before [push * $Dir])
+    ($Dir is one of [#west #east])
+    (wall position * $Room)
+    (move player to #in $Room)
+    You walk up to the painting.
+
+(narrate leaving $Room $Dir with #painting)
+    (from $Room go $Dir to $Target)
+    (now) (wall position #painting $Target)
+    You slide (the #painting) (name $Dir), and now it is (say painting location).
+    (if) (wall position #painting #chamber-ne)
+    (then) (now) ~(skeleton frowning)
+    (else) (now) (skeleton frowning)
+    (endif)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#player
+
+(current player *)
+(* is #in #chamber-s)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+(on every tick in $)
+    ~(lever pulled)
+    (lighting right)
+    (if) ~(current room #chamber-ne) ~(current room #chamber-nw)
+    (then) (now) (skeleton frowning)
+    (else) (now) ~(skeleton frowning)
+    (endif)
+
+(on every tick in $)
+    (lever pulled)
+    (if) ~(current room #chamber-s)
+    (then) (now) (skeleton frowning)
+    (else) (now) ~(skeleton frowning)
+    (endif)
+
+(on every tick in $)
+    (painting seen)
+    (select)
+
+        There's something strange about the painting.  Out of the
+        corner of your eye, you saw -- did it move?
+
+    (or)
+        (par) (say warm or cold)
+    (stopping)
+
+(say warm or cold)
+    (select)
+        You nervously eye the painting.
+    (or)
+        There's something strange about the painting.
+    (or)
+        A faint clattering sound emanates from the frame.
+    (or)
+        Something looms over the room.
+    (or)
+        The oil pigments seem to ripple across the canvas.
+    (or)
+        The painting catches your eye.
+    (or)
+        Did someone just sigh? Or was that a laugh?
+    (or)
+        On the wall a frozen face greets your gaze.
+    (or)
+        You hear an impatient tap-tap-tapping from within the canvas.
+    (or)
+        The canvas seems to tighten within its frame.
+    (or)
+        The painting appears slightly askew.
+    (cycling)
+
+    (if) (skeleton frowning)
+    (then)
+        (The archduke) appears to be frowning.
+    (else)
+        (The archduke) appears to hold a quizzical lorgnette to his eye-sockets.
+    (endif)
+
+(say warm or cold)
+    (select)
+        You nervously eye the painting:
+        (or)
+        There's something strange about the painting:
+        (or)
+     (at random)
+
+    (if) (skeleton frowning)
+    (then) (The archduke) is frowning.
+    (else)
+        (the archduke) holds a quizzical lorgnette to his eye-sockets.
+    (endif)

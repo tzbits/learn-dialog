@@ -82,6 +82,10 @@ Examples:
 * [The Last Joybooth
   Shift](https://intfiction.org/t/adjacent-to-let-s-learn-dialog-finite-switchable-game/78518),
   by Jason Compton
+* [chiaroscuro.dg](chiaroscuro.dg)
+  \[[Play Now](https://tzbits.com/dialog/chiaroscuro/)\]:
+  Chiaroscuro Chamber
+
 
 ## 4. More to come
 
