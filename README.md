@@ -67,6 +67,20 @@ Examples:
   \[[Play  Now](https://tzbits.com/dialog/lantern/)\]:
   Candle Lantern by tzbits.
 
-### 3. More to come
+### 3. The Attracts Game
+
+The Attracts Game: Use `($Room attracts $Obj)` to make something
+visible from several different rooms simultaneously, for example,
+a giant statue, a distant mountain, or a machine spanning
+multiple regions of an area. This mechanic ensures a single
+object remains in the player's scope across various locations,
+effectively simulating a larger physical scale without requiring
+the object to be manually moved between rooms.
+
+Examples:
+
+* [The Last Joybooth Shift](https://intfiction.org/t/adjacent-to-let-s-learn-dialog-finite-switchable-game/78518)
+
+### 4. More to come
 
 \-- Suggestions welcome \--
