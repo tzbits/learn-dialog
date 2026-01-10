@@ -1,108 +1,106 @@
-%% -*- mode: text; fill-column: 70; tab-stops: '(4 8 12 16 20); -*-
+(story title)     Meaning Crisis
+(story author)    tzbits
+(story ifid)      D549E425-0641-49FF-89A4-83C086D5E3E8
 
-(story title)	Meaning Crisis
-(story author)	tzbits
 (story noun)
+	an adaptation of The Little Match Girl by Hans Christian Andersen
 
-    an adaptation of The Little Match Girl by Hans Christian Andersen
-
-(story ifid)	D549E425-0641-49FF-89A4-83C086D5E3E8
-
-(style class @status)	height: 1em;
-(style class @italic)	font-style: italic;
+(style class @status)    height: 1em;
+(style class @italic)    font-style: italic;
 
 (intro)
 
-    (par) The sky empties itself of light on the cold last day of the
-    year.  And in this cold emptiness, you, with bare feet and an
-    uncovered head, wander the upscale urban streets of that
-    distinctly Western city.  You had been wearing cork sandals when
-    you left home.  But really they were useless, and having lost one
-    running between a quickly approaching sedan and an even faster
-    roadster, you discarded the other.  Your dainty feminine feet are
-    now red and blue with cold.
+	The sky empties itself of light on the cold last day of the year.  And in
+	this cold emptiness, you, with bare feet and an uncovered head, wander the
+	upscale urban streets of that distinctly Western city.  You had been
+	wearing cork sandals when you left home.  But really they were useless, and
+	having lost one running between a quickly approaching sedan and an even
+	faster roadster, you discarded the other.  Your dainty feminine feet are
+	now red and blue with cold.
+	
+	(par) Inside your monogrammed belt bag, you keep an equally monogrammed
+	metal wick lighter alongside a bundle of 20s.  You carry a second bundle of
+	20s tightfisted in your hand.
 
-    (par) Inside your monogrammed belt bag, you keep an equally
-    monogrammed metal wick lighter alongside a bundle of 20s.  You
-    carry a second bundle of 20s tightfisted in your hand.
+	(par) \[PRESS ANY KEY\]
 
-    (par) \[PRESS ANY KEY\]
-    (any key)
-    (clear all)
+	(any key)
+	(clear all)
 
-    (banner)
+	(banner)
 
-    (enter #streets)
+	(enter #streets)
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (global variable (temperature 11))
 
 (on every tick)
-    (temperature $Temp)
-    (narrate temperature $Temp)
-    ($Temp minus 1 into $Temperature)
-    (now) (temperature $Temperature)
+	(temperature $Temp)
+	(narrate temperature $Temp)
+	($Temp minus 1 into $Temperature)
+	(now) (temperature $Temperature)
 
 (past turning point)
-    (temperature $Temp)
-    ($Temp < 5)
+	(temperature $Temp)
+	($Temp < 5)
 
 (at turning point)
-    (temperature 5)
+	(temperature 5)
 
 (narrate temperature 9)
-    (par) The temperature is hovering around 9°C.
+	(par) The temperature is hovering around 9°C.
 
 (narrate temperature 8)
-    (par) The temperature is slowly dropping.
+	(par) The temperature is slowly dropping.
 
 (narrate temperature 7)
-    (par) It must be about 7°C now.
+	(par) It must be about 7°C now.
 
 (narrate temperature 6)
-    (par) It's 6°C, and the humid wind makes it feel even colder.
+	(par) It's 6°C, and the humid wind makes it feel even colder.
 
 (narrate temperature 5)
-    (par) What is it? About 5°C now?
+	(par) What is it? About 5°C now?
 
 (narrate temperature 4)
-    (par) It's getting close to freezing.  4°C now.
+	(par) It's getting close to freezing.  4°C now.
 
 (narrate temperature 3)
-    (par) It's getting colder.
+	(par) It's getting colder.
 
 (narrate temperature 2)
-    (par) The temperature drops to 2°C ...
+	(par) The temperature drops to 2°C ...
 
 (narrate temperature 1)
-    (par) It's now 1°C above fr-fr-fr-fr-fr-fr-
+	(par) It's now 1°C above fr-fr-fr-fr-fr-fr-
 
 (narrate temperature 0)
-    (if) (#player is #in #streets) (then)
-        (par) 0° now.  Can't.  Go.  On.
+	(if) (#player is #in #streets) (then)
+		(par) 0° now.  Can't.  Go.  On.
 
-        (par)\[MORE\]
-        (any key)
+		(par) \[MORE\]
+		
+		(any key)
+		(clear all)
+		(par) (div @quote) {
 
-        (clear all)
-        (par) (div @quote) {
+			In the dawn of morning there lay the poor little one, with pale
+			cheeks and frowning mouth, sitting on the curb; she had been frozen
+			to death on the last evening of the year; and the New-year's sun
+			rose and shone upon a little corpse! The youth still sat, in the
+			stiffness of death, wearing stylish clothes and holding a wad of
+			money in her hands.
 
-            In the dawn of morning there lay the poor little one,
-            with pale cheeks and frowning mouth, sitting on the curb;
-            she had been frozen to death on the last evening of the
-            year; and the New-year's sun rose and shone upon a little
-            corpse! The youth still sat, in the stiffness of death,
-            wearing stylish clothes and holding a wad of money in her
-            hands.
-
-        }
-        (game over { The End. })
-    (else)
-      (par) 0° now.
-    (endif)
+		}
+		(game over { The End. })
+	(else)
+	  (par) 0° now.
+	(endif)
 
 (narrate temperature $)
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -110,302 +108,292 @@
 
 (room *)
 (singleton *)
-(name *)	urban streets
 
-(from * go #north to #garage)
-    (past turning point)
-
-(from * go #north to #streets)
-    (at turning point) (or) ~(past turning point)
+(name *)    urban streets
 
 (from * go #south to #streets)
 (from * go #east to #streets)
 (from * go #west to #streets)
+(from * go #north to #garage)     (past turning point)
+(from * go #north to #streets)    (at turning point) (or) ~(past turning point)
 
 (instead of [look $Dir])
-    (#player is #in #streets)
-    To the (name $Dir) there are more streets.
-    (if) (past turning point) (then)
-        (line) A parking garage is somewhere north.
-    (endif)
+	(#player is #in #streets)
+	To the (name $Dir) there are more streets.
+	(if) (past turning point) (then)
+		(line) A parking garage is somewhere north.
+	(endif)
 
 (maybe garage is nearby)
-    (if) (at turning point) (then)
+	(if) (at turning point) (then)
 
-        (par) You notice a blue sign with a white letter P.
-        (line) A parking garage must be somewhere north.
+		(par) You notice a blue sign with a white letter P.
+		(line) A parking garage must be somewhere north.
 
-    (endif)
+	(endif)
 
 (look #streets)
-    (select)
+	(select)
 
-        (par) You've been wandering around like a zombie all day, and
-        this street doesn't look much different than the others.
+		You've been wandering around like a zombie all day, and this street
+		doesn't look much different than the others.
 
-        (if) ~(past turning point) (then)
+		(if) ~(past turning point) (then)
 
-            You can wander in any direction.  And it won't
-            matter. (span @italic) { Really. }
+			You can wander in any direction.  And it won't
+			matter. (span @italic) { Really. }
 
-        (endif)
+		(endif)
 
-    (or)
+	(or)
 
-        (par) Snow is falling and lightly blankets the walkways.
+		Snow is falling and lightly blankets the walkways.
 
-        (par) Your footsteps leave holes in that blanket as you stray
-        about.
+		(par) Your footsteps leave holes in that blanket as you stray about.
 
-    (or)
+	(or)
 
-        The streets are fairly desserted except for the occasional
-        delivery car driving by.
+		The streets are fairly desserted except for the occasional delivery car
+		driving by.
 
-    (or)
+	(or)
 
-        You see animated silhouette behind the curtains of a house
-        nearby, and you hear the social murmer of the gathering
-        inside.
+		You see animated silhouette behind the curtains of a house nearby, and
+		you hear the social murmer of the gathering inside.
 
-    (or)
+	(or)
 
-        The buzzing of a street light grows and fades as you walk
-        under it.
+		The buzzing of a street light grows and fades as you walk under it.
 
-    (or)
+	(or)
 
-        The streets are starting to all look the same to your glassy
-        eyes as you gray out.
+		The streets are starting to all look the same to your glassy eyes as
+		you gray out.
 
-    (stopping)
-    (maybe garage is nearby)
+	(stopping)
+	(maybe garage is nearby)
 
 (narrate leaving #streets $Dir)
-    (if) (from #streets go #north to #streets) (then)
+	(if) (from #streets go #north to #streets) (then)
 
-        You wander aimlessly (name $Dir).
+		You wander aimlessly (name $Dir).
 
-    (endif)
+	(endif)
 
 (narrate entering #streets)
-    (select)
+	(select)
 
-        (par) On this street, more than one building has busy windows
-        that glow with the light and warmth of a holiday gathering.
+		(par) On this street, more than one building has busy windows that glow
+		with the light and warmth of a holiday gathering.
 
-        (par) Yes, remember that? (span @italic) { It is New Year's
-        eve, right? }
+		(par) Yes, remember that?
+		(span @italic) { It is New Year's eve, right? }
 
-    (or)
+	(or)
 
-        (par) Smells from delivery trucks and catered dinners swirl
-        around you.  The wind shifts and conveys evidence of a roast
-        goose on some table nearby.  No, on second thought, maybe it
-        was just pepperoni pizza.
+		(par) Smells from delivery trucks and catered dinners swirl around you.
+		The wind shifts and conveys evidence of a roast goose on some table
+		nearby.  No, on second thought, maybe it was just pepperoni pizza.
 
-    (or)
+	(or)
 
-        (par) After a quick stop to rub your damaged toes, you realize
-        you can't win against the cold.  But you can't go home.  It's
-        just as (span @italic){cold} there.  Certainly your father
-        will scorn you and your mother will scoff.  It's their duty.
+		(par) After a quick stop to rub your damaged toes, you realize you
+		can't win against the cold.  But you can't go home.  It's just as
+		(span @italic){cold} there.  Certainly your father will scorn you and
+		your mother will scoff.  It's their duty.
 
-        (par) Until their own torpor sets in and they lose themselves
-        in the flickering blue light of their phones.
+		(par) Until their own torpor sets in and they lose themselves in the
+		flickering blue light of their phones.
 
-    (or)
+	(or)
 
-        (if) (at turning point) (or) (past turning point) (then)
+		(if) (at turning point) (or) (past turning point) (then)
 
-            (par) You seem to have gotten yourself lost.
+			(par) You seem to have gotten yourself lost.
 
-        (else)
+		(else)
 
-            (par) Now your hands are aching from the cold. Maybe you
-            should go home.
+			(par) Now your hands are aching from the cold. Maybe you should go
+			home.
 
-            (par) But you seem to have gotten yourself lost.
+			(par) But you seem to have gotten yourself lost.
 
-        (endif)
+		(endif)
 
-    (stopping)
+	(stopping)
 
-    (maybe garage is nearby)
+	(maybe garage is nearby)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #garage
+
 (room *)
 (singleton *)
-(name *)	multi-story parking garage
+
+(name *)    multi-story parking garage
 
 (narrate entering #garage)
-    (clear all)
+	(clear all)
 
-    (par) You make your way north toward a multi-story parking garage.
-    You enter and hobble to an unlit corner where the light has
-    failed.  You sit down, hug your knees, and shiver.
+	You make your way north toward a multi-story parking garage. You enter and
+	hobble to an unlit corner where the light has failed.  You sit down, hug
+	your knees, and shiver.
+	
+	(par) You pull the metal lighter out of your belt bag.  You turn the reeded
+	sparkwheel and feel the friction as it grinds against the flint.  You flick
+	your thumb--scratch!--how beautiful the flame burns.
 
-    (par) You pull the metal lighter out of your belt bag.  You turn
-    the reeded sparkwheel and feel the friction as it grinds against
-    the flint.  You flick your thumb--scratch!--how beautiful the
-    flame burns.
-
-    (par) Your glassy eyes distort your sight when you look in various
-    directions.
+	(par) Your glassy eyes distort your sight when you look in various
+	directions.
 
 (look #garage)
 
-    (par) The garage is mostly empty.  A lot of people are on vacation
-    at this time of year.
+	The garage is mostly empty.  A lot of people are on vacation at this time
+	of year.
 
-    (par) Your eyes are glassy.  You feel the urge to go
-    somewhere. North?  South?  East?  West?  Up?
+	(par) Your eyes are glassy.  You feel the urge to go somewhere. North?
+	South? East?  West?  Up?
 
 (instead of [look $Dir])
-    (#player is #in #garage)
-    (temperature $Temp)
-    (hallucinate $Temp $Dir)
+	(#player is #in #garage)
+	(temperature $Temp)
+	(hallucinate $Temp $Dir)
 
 (prevent [leave #garage $Dir])
-    (temperature $Temp)
-    (hallucinate $Temp $Dir)
+	(temperature $Temp)
+	(hallucinate $Temp $Dir)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 (global variable (burn count 0))
 
 (inc burn count)
-    (burn count $Count)
-    ($Count plus 1 into $NewCount)
-    (now) (burn count $NewCount)
+	(burn count $Count)
+	($Count plus 1 into $NewCount)
+	(now) (burn count $NewCount)
 
 (already burned)
-    (burn count $Count)
-    ($Count > 0)
+	(burn count $Count)
+	($Count > 0)
 
 (another twenty)
-    (if) (already burned) (then)
-        another
-    (else)
-        a
-    (endif)
-    20
+	(if) (already burned) (then)
+		another
+	(else)
+		a
+	(endif)
+	20
 
 (hallucinate 4 $Dir)
 
-    (par) You take (another twenty) from the stack of money and light
-    it on fire.  How it sputters as it burns! It gives the light of a
-    torch and as you hold your other hand over it, it warms you.
+	(par) You take (another twenty) from the stack of money and light it on
+	fire. How it sputters as it burns! It gives the light of a torch and as you
+	hold your other hand over it, it warms you.
 
-    (par) When you look (name $Dir) you seem to be sitting by a large
-    luxurious fireplace.  Polished brass candlesticks sit on the
-    mantle, and the burning candles flank the fire.  Your deceased
-    grandmother is there singing a haunting melody.
+	(par) When you look (name $Dir) you seem to be sitting by a large luxurious
+	fireplace.  Polished brass candlesticks sit on the mantle, and the burning
+	candles flank the fire.  Your deceased grandmother is there singing a
+	haunting melody.
 
-    (par) But then the flame goes out and you see nothing but yellow
-    parking lines and cold cement.
+	(par) But then the flame goes out and you see nothing but yellow parking
+	lines and cold cement.
 
-    (inc burn count)
+	(inc burn count)
 
 (hallucinate 3 $Dir)
 
-    (par) You take (another twenty) from the stack of money and light
-    it on fire.  The crackling heat escapes along with black smoke.
+	(par) You take (another twenty) from the stack of money and light it on
+	fire. The crackling heat escapes along with black smoke.
 
-    (par) You look (name $Dir).
+	(par) You look (name $Dir).
 
-    (par) You see a large fireplace (if) (already burned) (then) again
-    (endif).  How the fire burns! You stretch your feet out to warm
-    them, when, lo!, the flames burn your feet, and then the money
-    flame goes out.  The fire place vanishes, and you hold only the
-    remains of a burnt bill in your hand.
+	(par) You see a large fireplace (if) (already burned) (then) again (endif).
+	How the fire burns! You stretch your feet out to warm them, when, lo!, the
+	flames burn your feet, and then the money flame goes out.  The fire place
+	vanishes, and you hold only the remains of a burnt bill in your hand.
 
-    (inc burn count)
+	(inc burn count)
 
 (hallucinate 2 $Dir)
 
-    You turn the sparkwheel of the lighter and the satisfying scratch
-    and spark bring the flame back to life.
+	(par) You turn the sparkwheel of the lighter and the satisfying scratch and spark
+	bring the flame back to life.
 
-    (par) You light (another twenty) on fire and look (name $Dir).
-    And as the flame flickers, the light reaches the nearby wall.
+	(par) You light (another twenty) on fire and look (name $Dir). And as the
+	flame flickers, the light reaches the nearby wall.
 
-    (par) It is as if you can see through a transparent screen into a
-    room.  There is a table covered by double-layered linens.  In the
-    center is a smoldering over-roasted goose on a dish.  After a
-    creepy shiver, it jumps down from the dish and slowly waddles
-    toward you with a menacing knife and fork in its back.
+	(par) It is as if you can see through a transparent screen into a room.
+	There is a table covered by double-layered linens.  In the center is a
+	smoldering over-roasted goose on a dish.  After a creepy shiver, it jumps
+	down from the dish and slowly waddles toward you with a menacing knife and
+	fork in its back. (par) Then the flame goes out, and you see nothing
+	remaining but the damp cement wall you had seen before.
 
-    (par) Then the flame goes out, and you see nothing remaining but
-    the damp cement wall you had seen before.
-
-    (inc burn count)
+	(inc burn count)
 
 (hallucinate 1 $Dir)
 
-    (par) You light (another twenty) on fire and by its light, you
-    look (name $Dir) and find yourself sitting under a beautiful
-    Chrismas tree.
+	(par) You light (another twenty) on fire and by its light, you look (name
+	$Dir) and find yourself sitting under a beautiful Chrismas tree.
 
-    (par) Chrismas lights are wrapped around it, and they begin to
-    rise higher and higher, and now they look like stars in the sky.
-    One star makes a streaking fall, and you remember your grandmother
-    telling you that when a star falls a soul goes up to God.
+	(par) Chrismas lights are wrapped around it, and they begin to rise higher
+	and higher, and now they look like stars in the sky. One star makes a
+	streaking fall, and you remember your grandmother telling you that when a
+	star falls a soul goes up to God.
 
-    (par) Then the flame goes out, and you stare at nothing more than
-    a useless bit of charred paper.
+	(par) Then the flame goes out, and you stare at nothing more than a useless
+	bit of charred paper.
 
 (hallucinate 0 $Dir)
 
-    (par) You look (name $Dir). You pull (another twenty) out of the
-    stack.  But before you light it...
+	(par) You look (name $Dir). You pull (another twenty) out of the stack. But
+	before you light it...
 
-    (line)\[MORE\]
+	(line) \[MORE\]
 
-    (any key)
+	(any key)
+	(clear all)
 
-    (clear all)
+	Voices.  Footsteps.  Emergency.  Someone is rushing into the garage.
 
-    (par) Voices.  Footsteps.  Emergency.  Someone is rushing into the
-    garage.
+	(par) You feel a hand on your shoulder, a gaze into your eyes. Strong arms
+	pick you up.  The money, the belt bag, the lighter: they all fall to the
+	floor.
 
-    (par) You feel a hand on your shoulder, a gaze into your eyes.
-    Strong arms pick you up.  The money, the belt bag, the lighter:
-    they all fall to the floor.
+	(par) "Mom? Dad?" You blink, your vision a bending tear.
 
-    (par) "Mom? Dad?" You blink, your vision a bending tear.
+	(par) "You're going to be ok.  We're here.  We're going to get you to
+	safety." Suddenly, for the first time, in a long time, you feel warmth.
 
-    (par) "You're going to be ok.  We're here.  We're going to get you
-    to safety."
+	(par) And it's real.
 
-    Suddenly, for the first time, in a long time, you feel warmth.
-    And it's real.
+	(game over { The End })
 
-    (game over { The End })
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #player
 
 (current player *)
-(descr *)
-
-    (select)
-
-        (par) Having wandered around aimlessly all day, your tiny
-        belly aches with cold and hunger--you are the picture of
-        misery.  Your hair covers your shoulders, and snowflakes cover
-        your hair... but you regard them not.
-
-    (or)
-
-        Well, there you are.  The picture of misery.
-
-    (stopping)
-
-    (maybe garage is nearby)
 
 (* is #in #streets)
+
+(descr *)
+
+	(select)
+
+		Having wandered around aimlessly all day, your tiny belly aches with
+		cold and hunger--you are the picture of misery.  Your hair covers your
+		shoulders, and snowflakes cover your hair... but you regard them not.
+
+	(or)
+
+		Well, there you are.  The picture of misery.
+
+	(stopping)
+
+	(maybe garage is nearby)
+
+
