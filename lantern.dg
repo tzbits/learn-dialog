@@ -1,10 +1,10 @@
-(story title)     Candle Lantern
-(story author)    tzbits
-(story noun)      a finite light source game
-(story ifid)      8B2964B8-02D2-4420-812C-D17926D2B4EA
+(story title)   Candle Lantern
+(story author)  tzbits
+(story noun)    a finite light source game
+(story ifid)    8B2964B8-02D2-4420-812C-D17926D2B4EA
 
-(style class @status)    height: 1em;
-(style class @italic)    font-style: italic;
+(style class @status)  height: 1em;
+(style class @italic)  font-style: italic;
 
 (intro)
 
@@ -20,7 +20,7 @@
 	(clear all)
 
 	(banner)
-	
+
 	(enter #cottage)
 
 
@@ -50,11 +50,11 @@
 #front-porch
 
 (room *)
-(name *)    front porch
+(name *)  front porch
 
 (from * go #west to #cottage)
 
-(look *)    It faces east where your car is parked.
+(look *)  It faces east where your car is parked.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,7 +64,7 @@
 (room *)
 (singleton *)
 
-(name *)    cottage
+(name *)  cottage
 
 (from * go #east to #front-porch)
 (from * go #west to #back-porch)
@@ -89,7 +89,7 @@
 
 (supporter *)
 
-(name *)    table
+(name *)  table
 
 (* is #in #cottage)
 
@@ -109,11 +109,11 @@
 (item *)
 (switchable *)
 
-(name *)     metal candle lantern
-(dict *)     white candle
-(dict *)     matches
-(dict *)     match
-(heads *)    metal candle lantern
+(name *)   metal candle lantern
+(dict *)   white candle
+(dict *)   matches
+(dict *)   match
+(heads *)  metal candle lantern
 
 (* is #on #table)
 
@@ -146,7 +146,7 @@
 		in a lantern box. (say match count)
 
 	(else)
-	
+
 		A new candle with a bright flame in a lantern box.
 
 	(endif)
@@ -173,12 +173,12 @@
 
 (room *)
 
-(name *)    back porch
+(name *)  back porch
 
 (from * go #east to #cottage)
 (from * go #west to #forest)
 
-(look *)    It faces the forbidden forest to the west.
+(look *)  It faces the forbidden forest to the west.
 
 (after [switch on #lantern])
 	(#player is #in *)
@@ -196,7 +196,7 @@
 
 (room *)
 
-(name *)    forbidden forest
+(name *)  forbidden forest
 
 (from * go #east to #back-porch)
 (from * go #north/#south/#west to *)
@@ -210,8 +210,8 @@
 	(else)
 		(select)
 
-			The distant light appears again.  It runs away from you
-			north.  Then it stops.  Then it runs away again south.
+			The distant light appears again.  It runs away from you north.
+			Then it stops.  Then it runs away again south.
 
 		(or)
 
@@ -263,8 +263,8 @@
 
 (narrate lose)
 	(clear all)
-	
-	"Oh, no! You have been eaten by a lurking grue!
+
+	"Oh, no! You have been eaten by a lurking grue!"
 
 	(game over { Game Over. })
 
@@ -274,7 +274,7 @@
 	(#lantern is #heldby #player)
 
 	(now) (#lantern is off)
-	
+
 	As you walk (name $Dir), a puff of wind blows out the candle.
 	(par)
 	(span @italic){
@@ -284,17 +284,17 @@
 	(par)
 	(select)
 
-		You recall your mom's reaction when you planned this trip, "Why are
-		you vacationing alone? You're 28.  When are you going to find a
-		nice girl and get married?" (span @italic) {She's proably right.}
-		
+		You recall your mom's reaction when you planned this trip, "Why are you
+		vacationing alone? You're 28.  When are you going to find a nice girl
+		and get married?" (span @italic) {She's proably right.}
+
 		(par) (span @italic) {I should call Ina.  Or Niki.  Or Annabel.}
 
 	(or)
 
-		You are wearing a black T-shirt: part of your minimalist phase.
-		Last year it was Gorpcore.  You told everyone you were going to
-		thru-hike the PCT, and then never left the city limits.
+		You are wearing a black T-shirt: part of your minimalist phase.  Last
+		year it was Gorpcore.  You told everyone you were going to thru-hike
+		the PCT, and then never left the city limits.
 
 	(or)
 
@@ -331,10 +331,12 @@
 
 (current player *)
 
-(descr *)    Well, there you are.  On vacation at last.
+(descr *)  Well, there you are.  On vacation at last.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Grammar Rules
 
 (grammar [light [object]] for [switch on $])
 (grammar [blow out [object]] for [switch off $])
