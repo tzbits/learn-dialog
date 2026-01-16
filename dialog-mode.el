@@ -13,14 +13,14 @@
 ;; This package provides a major mode for the Dialog interactive fiction
 ;; programming language. It includes syntax highlighting, indentation,
 ;; and paragraph navigation.
-
+;;
 ;; Installation:
 ;;
 ;; To install manually, place dialog-mode.el in your load-path and add
 ;; the following to your init file:
 ;;
 ;;   (require 'dialog-mode)
-
+;;
 ;; Keybindings:
 ;;
 ;; The mode enables indent-tabs-mode and provides context-aware
@@ -29,15 +29,18 @@
 ;;   M-q   dialog-fill-paragraph  Fill prose respecting Dialog indentation.
 ;;   M-.   xref-find-definitions  Jump to rule or object definitions.
 ;;   M-,   xref-go-back           Return to previous location.
-;;   M-g i imenu                  Search for objects or section headers.
+;;
+;; Commenting (emacs default bindings):
+;;
+;;   M-;     comment-dwim           Inserts %% before or after lines
+;;   C-c C-; dialog-insert-divider  Inserts % divider, dialog-fill-column wide
 ;;
 ;; Navigation (Imenu):
 ;;
-;; This mode automatically populates a "Story" menu in the menu bar
-;; when using a graphical display. You can use M-g i to quickly
-;; navigate to object definitions (#object) or section headers (lines
-;; that start with %% in column 0, folowed by a space and a capital
-;; letter).
+;; This mode populates a "Story" menu in the menu bar when using a
+;; graphical display. You can also use M-g i to navigate to object
+;; definitions (#object) or section headers (lines that start with %%
+;; in column 0, folowed by a space and a capital letter).
 
 ;;; Code:
 
@@ -71,31 +74,29 @@
 
 (defvar-keymap dialog-mode-map
   :doc "Keymap for `dialog-mode'."
-  "M-q" #'dialog-fill-paragraph)
+  "M-q" 'dialog-fill-paragraph
+  "C-c C-;" 'dialog-insert-comment-divider)
 
 (defconst dialog-font-lock-keywords
   (list
-   ;; These sigils designate global objects, keywords, and variables.
-   ;; We match the prefix to ensure they are visually distinct.
    (list (rx "#" dialog-identifier) 0 'font-lock-constant-face)
    (list (rx "@" dialog-identifier) 0 'font-lock-keyword-face)
    (list (rx "$" dialog-identifier) 0 'font-lock-variable-name-face)
 
-   ;; Highlighting only group 1 prevents the parenthesis from being
+   ;; Highlight only group 1 to prevent the parenthesis from being
    ;; colored as part of the function name.
    (list (rx "(" (group-n 1 dialog-identifier)) 1 'font-lock-function-name-face))
   "Keyword highlighting specification for `dialog-mode'.")
 
 (defvar dialog-mode-syntax-table
   (let ((table (make-syntax-table)))
-    ;; The '12b' flags specify that '%' is the first and second
-    ;; character of a two-char comment starter (%%), compatible
-    ;; with the 'b' comment style.
+    ;; Use '12b' flags to specify that '%' is a two-char comment
+    ;; starter (%%), using the 'b' comment style.
     (modify-syntax-entry ?% ". 12b" table)
+    ;; Declare newline as the end delimiter of the 'b' comment style.
     (modify-syntax-entry ?\n "> b" table)
 
-    ;; Defining pairs allows Emacs to handle structural movement
-    ;; like `forward-sexp` correctly.
+    ;; Define pairs to handle structural movement correctly.
     (modify-syntax-entry ?\( "()" table)
     (modify-syntax-entry ?\) ")(" table)
     (modify-syntax-entry ?\[ "()" table)
@@ -103,15 +104,19 @@
     (modify-syntax-entry ?\{ "()" table)
     (modify-syntax-entry ?\} ")(" table)
 
-    ;; By marking #, $, and @ as symbol constituents (_), Emacs commands
-    ;; like `symbol-at-point` will include these sigils automatically.
+    ;; Marking #, $, and @ as symbol constituents (_), so that Emacs
+    ;; commands like `symbol-at-point` will include these sigils.
     (modify-syntax-entry ?# "_" table)
     (modify-syntax-entry ?$ "_" table)
     (modify-syntax-entry ?@ "_" table)
 
-    ;; Dialog identifiers frequently use hyphens and underscores.
-    (modify-syntax-entry ?- "w" table)
-    (modify-syntax-entry ?_ "w" table)
+    ;; Dialog identifiers may use hyphens and underscores.
+    (modify-syntax-entry ?- "_" table)
+    (modify-syntax-entry ?_ "_" table)
+
+    ;; There are no bracketed strings in dialog.
+    (modify-syntax-entry ?\" "w" table)
+
     table)
   "Syntax table for `dialog-mode'.")
 
@@ -120,8 +125,8 @@
 (defun dialog--project-files ()
   "Return a list of .dg files in the current project or directory."
   (let* ((root (or (vc-root-dir) default-directory))
-         ;; We generate the regex once to avoid overhead during
-         ;; the recursive directory walk.
+         ;; Generate the regex once to avoid overhead during the
+         ;; recursive directory walk.
          (exclude-re (regexp-opt dialog-ignored-directories 'symbols)))
     (directory-files-recursively
      root
@@ -144,9 +149,9 @@ list of `xref-item' structs."
     (when search-regexp
       (dolist (file files)
         (with-temp-buffer
-          ;; We use a temp buffer and `insert-file-contents' to avoid the
-          ;; overhead of `find-file-noselect' which would trigger major modes
-          ;; and hooks for every file in the project.
+          ;; Use a temp buffer and `insert-file-contents' to avoid the
+          ;; overhead of `find-file-noselect', which would trigger
+          ;; major modes and hooks for every file in the project.
           (insert-file-contents file)
           (goto-char (point-min))
           (while (re-search-forward search-regexp nil t)
@@ -161,10 +166,11 @@ list of `xref-item' structs."
   "Determine the correct search pattern based on the SYMBOL prefix."
   (cond
    ((string-prefix-p "#" symbol)
-    ;; Objects are defined as the identifier alone at the start of a line.
+    ;; Dialog objects are declared by placing the identifier alone at
+    ;; the start of a line.
     (concat "^" (regexp-quote symbol) "$"))
    ((dialog--at-symbol-with-prefix-p "(")
-    ;; Rules are defined starting with ( or *(.
+    ;; Rules are defined by lines starting with ( or *(.
     (concat "^\\(?:(\\|\\*(\\)" (regexp-quote symbol)))
    (t nil)))
 
@@ -242,6 +248,30 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
         (progn (back-to-indentation) (current-column))
       -1)))
 
+;;; Commenting
+
+(defun dialog--looking-at-blank-p (n)
+  "Returns true if point is on a blank line.
+Moves N lines forward first (backward if N is negative or to line
+begin if N is 0)."
+  (save-excursion
+    (when (not (= n 0)) (forward-line n))
+    (forward-line 0)
+    (looking-at "^\s*$")))
+
+(defun dialog-insert-comment-divider ()
+  "Inserts a % comment divider dialog-fill-column wide."
+  (interactive)
+  (let ((blank-before (dialog--looking-at-blank-p -1))
+        (blank-on (dialog--looking-at-blank-p 0)))
+    (unless blank-before
+      (forward-line 0)
+      (open-line 2)
+      (forward-line 1))
+    (insert-char ?% dialog-fill-column)
+    (unless blank-on
+      (open-line 2))))
+
 ;;;###autoload
 (define-derived-mode dialog-mode text-mode "Dialog"
   "Major mode for editing Dialog interactive fiction files.
@@ -258,9 +288,6 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
   (setq-local imenu-generic-expression
               `((nil "^\\s-*\\(#" dialog-identifier "\\)" 1)
                 (nil "^%% \\([A-Z].*[^\n]\\)" 1)))
-
-  ;; Calling this ensures that Imenu is populated and accessible
-  ;; via the menu bar in GUI sessions.
   (imenu-add-to-menubar "Story")
 
   (setq-local fill-paragraph-function #'dialog-fill-paragraph)
