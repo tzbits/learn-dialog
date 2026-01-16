@@ -75,7 +75,8 @@
 (defvar-keymap dialog-mode-map
   :doc "Keymap for `dialog-mode'."
   "M-q" 'dialog-fill-paragraph
-  "C-c C-;" 'dialog-insert-comment-divider)
+  "C-c C-;" 'dialog-insert-comment-divider
+  "C-c C-f" 'dialog-format-buffer)
 
 (defconst dialog-font-lock-keywords
   (list
@@ -185,16 +186,45 @@ list of `xref-item' structs."
 
 ;;; Paragraph Handling
 
+(defun dialog--looking-at-special-p ()
+  "Check if point is at a Dialog special character sequence."
+  (looking-at-p (rx (any "#$@~*|([{} "))))
+
+(defun dialog--looking-at-comment-p ()
+  (looking-at-p "%%"))
+
+(defun dialog--looking-at-css-rule-p ()
+  (looking-at "\\([a-z-]+\\):[ \t]*\\([^;\n]+\\);"))
+
+(defun dialog--looking-at-rule-logic-p ()
+  "Check if this is rule logic (not an inline rule call followed by story text)."
+  (and (dialog--looking-at-special-p)
+       (or (not (looking-at "("))
+           (not
+            ;; an embedded rule like: (par) The dog sat.
+            (save-excursion
+              (let ((line (line-number-at-pos)))
+                (forward-sexp 1)
+                (skip-chars-forward " \t")
+                (and (= line (line-number-at-pos))
+                     (not (dialog--looking-at-special-p))
+                     (not (eolp)))))))))
+
 (defun dialog-fill-paragraph (&optional justify)
   "Fill the current paragraph.
 JUSTIFY is passed to `fill-region-as-paragraph'."
   (interactive "P")
-  (if (dialog--looking-at-compact-rules-p)
-      (dialog-align-compact-rules)
+  (cond
+   ((save-excursion (back-to-indentation) (looking-at-p "\\s-*$")))
+   ((dialog--looking-at-compact-rules-p) (dialog-align-compact-rules))
+   (t
     (save-excursion
       (let ((start (progn (dialog-beginning-of-paragraph) (point)))
             (end (progn (dialog-end-of-paragraph) (point))))
-        (fill-region-as-paragraph start end justify)))))
+        (when (/= (line-number-at-pos start) (line-number-at-pos end))
+          (if (save-excursion (goto-char start) (dialog--looking-at-comment-p))
+              (fill-region start end justify)
+            (fill-region-as-paragraph start end justify))))))))
 
 (defun dialog-beginning-of-paragraph ()
   "Move point to the beginning of the current Dialog paragraph."
@@ -202,16 +232,24 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
   (back-to-indentation)
   (let ((col (current-column)))
     (catch 'done
-      (when (dialog--looking-at-special-p)
+
+      (when (dialog--looking-at-comment-p)
+        (dialog--beginning-of-comment)
         (throw 'done t))
+
+      (when (dialog--looking-at-css-rule-p)
+        (throw 'done t))
+
+      (when (dialog--looking-at-rule-logic-p)
+        (throw 'done t))
+
       (while (and (not (bobp))
-                  (= (dialog--get-previous-indent)
-                     col))
+                  (= (dialog--get-previous-indent) col))
         (forward-line -1)
         (back-to-indentation)
         (when (looking-at-p "(par)")
           (throw 'done t))
-        (when (dialog--looking-at-special-p)
+        (when (dialog--looking-at-rule-logic-p)
           (forward-line 1)
           (back-to-indentation)
           (throw 'done t))))))
@@ -222,19 +260,36 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
   (back-to-indentation)
   (let ((col (current-column)))
     (catch 'done
+
+      (when (dialog--looking-at-comment-p)
+        (dialog--end-of-comment)
+        (throw 'done t))
+
+      (when (dialog--looking-at-css-rule-p)
+        (end-of-line)
+        (throw 'done t))
+
+      (when (looking-at-p "\\s-*$")
+        (throw 'done t))
+
+      (when (dialog--looking-at-rule-logic-p)
+        (end-of-line)
+        (throw 'done t))
+
       (while (and (not (eobp))
-                  (= (dialog--get-next-indent) col))
+                  (= (dialog--get-next-indent) col)
+                  (not (dialog--looking-at-rule-logic-p))
+                  (not (save-excursion
+                         (forward-line 1)
+                         (back-to-indentation)
+                         (looking-at-p "\\s-*$"))))
         (forward-line 1)
         (back-to-indentation)
-        (when (dialog--looking-at-special-p)
+        (when (dialog--looking-at-rule-logic-p)
           (forward-line -1)
           (end-of-line)
           (throw 'done t)))))
   (end-of-line))
-
-(defun dialog--looking-at-special-p ()
-  "Check if point is at a Dialog special character sequence."
-  (looking-at-p (rx (or (any "#$@~*|([{} ") "%%"))))
 
 (defun dialog--get-previous-indent ()
   "Get the indentation of the previous line."
@@ -280,12 +335,15 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
       ;; be formatted without re-searching.
       (save-excursion
         (while (and (not (eobp)) (looking-at-p "^("))
-          (forward-sexp 1)
-          (setq max-head-column (max max-head-column (current-column)))
+          (forward-sexp 1 nil)
+          (when (not (looking-at-p "\\s-*$"))
+            (setq max-head-column (max max-head-column (current-column))))
           (push (point) head-end-columns)
           (forward-line 1)))
 
-      (let ((align-column (+ max-head-column dialog-tab-width))
+      (let ((align-column (if (< (+ max-head-column 1) (* 4 dialog-tab-width))
+                              (* 4 dialog-tab-width)
+                            (align-to-tab-stop max-head-column)))
             ;; Shadow indent-tabs-mode to nil so that `indent-to` uses
             ;; spaces for alignment.
             (indent-tabs-mode nil))
@@ -295,9 +353,63 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
           (unless (eolp)
             (indent-to align-column)))))))
 
+(defun align-to-tab-stop (col)
+  (let ((stop (* (/ col dialog-tab-width) dialog-tab-width)))
+    (if (<= stop (1+ col))
+        (+ stop dialog-tab-width)
+      stop)))
+
+;;; Format buffer
+
+(defun dialog-format-buffer ()
+  "Iterate through the buffer and fill all paragraphs and compact rules."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (eobp))
+      (back-to-indentation)
+      (cond
+       ((dialog--looking-at-comment-p)
+        ;; Don't touch comments: they are often specially formatted.
+        (dialog--end-of-comment)
+        (forward-line 1))
+
+       ((dialog--looking-at-compact-rules-p)
+        (dialog-align-compact-rules)
+        ;; dialog-end-of-paragraph treats each individual rule as a
+        ;; paragraph, but compact rules are all formatted once
+        ;; together, so move forward out of the block.
+        (while (and (not (eobp)) (dialog--looking-at-compact-rules-p))
+          (forward-line 1)))
+
+       ((looking-at-p "^\\s-*$")
+        (forward-line 1))
+
+       (t
+        (dialog-fill-paragraph)
+        (dialog-end-of-paragraph)
+        (unless (eobp)
+          (forward-line 1)))))))
 
 
 ;;; Commenting
+
+(defun dialog--beginning-of-comment ()
+  (while (and (not (bobp))
+              (save-excursion
+                (forward-line -1)
+                (back-to-indentation)
+                (dialog--looking-at-comment-p)))
+    (forward-line -1)))
+
+(defun dialog--end-of-comment ()
+  (while (and (not (bobp))
+              (save-excursion
+                (forward-line 1)
+                (back-to-indentation)
+                (dialog--looking-at-comment-p)))
+    (forward-line 1))
+  (end-of-line))
 
 (defun dialog--looking-at-blank-p (n)
   "Returns true if point is on a blank line.
@@ -331,7 +443,17 @@ begin if N is 0)."
   (setq-local indent-tabs-mode t)
   (setq-local tab-width dialog-tab-width)
   (setq-local fill-column dialog-fill-column)
+
   (setq-local comment-start "%% ")
+  ;; This regexp tells Emacs where the "actual text" begins on a comment line.
+  (setq-local comment-start-skip "\\(?:%%+\\s-*\\)")
+
+  ;; This tells the paragraph motion commands that a line containing
+  ;; ONLY a comment starter (and optional whitespace) is a paragraph boundary.
+  ;; This prevents the filling engine from merging lines separated by a '%%' line.
+  (setq-local paragraph-separate (concat "^\\s-*%%+\\s-*$\\|" paragraph-separate))
+  (setq-local paragraph-start (concat "^\\s-*%%+\\s-*$\\|" paragraph-start))
+
   (setq-local font-lock-defaults '(dialog-font-lock-keywords))
 
   (setq-local imenu-generic-expression
@@ -339,7 +461,7 @@ begin if N is 0)."
                 (nil "^%% \\([A-Z].*[^\n]\\)" 1)))
   (imenu-add-to-menubar "Story")
 
-  (setq-local fill-paragraph-function #'dialog-fill-paragraph)
+  ;;(setq-local fill-paragraph-function #'dialog-fill-paragraph)
 
   ;; Add hooks with DEPTH `nil' and LOCAL `t' to ensure they only
   ;; trigger in Dialog buffers.
