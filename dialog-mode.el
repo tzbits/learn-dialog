@@ -189,10 +189,12 @@ list of `xref-item' structs."
   "Fill the current paragraph.
 JUSTIFY is passed to `fill-region-as-paragraph'."
   (interactive "P")
-  (save-excursion
-    (let ((start (progn (dialog-beginning-of-paragraph) (point)))
-          (end (progn (dialog-end-of-paragraph) (point))))
-      (fill-region-as-paragraph start end justify))))
+  (if (dialog--looking-at-compact-rules-p)
+      (dialog-align-compact-rules)
+    (save-excursion
+      (let ((start (progn (dialog-beginning-of-paragraph) (point)))
+            (end (progn (dialog-end-of-paragraph) (point))))
+        (fill-region-as-paragraph start end justify)))))
 
 (defun dialog-beginning-of-paragraph ()
   "Move point to the beginning of the current Dialog paragraph."
@@ -247,6 +249,53 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
     (if (zerop (forward-line 1))
         (progn (back-to-indentation) (current-column))
       -1)))
+
+;;; Compact Rules
+
+(defun dialog--looking-at-compact-rules-p ()
+  "Return non-nil if point is in a block of compact rules."
+  (save-excursion
+    (forward-line 0)
+    ;; We check the current, previous, or next line because the user
+    ;; might trigger fill-paragraph while the cursor is anywhere in the block.
+    (looking-at-p "^(")))
+
+(defun dialog-align-compact-rules ()
+  "Align the rule bodies in a compact block."
+  (interactive)
+  (save-excursion
+    (let ((max-head-column 0)
+          (head-end-columns nil))
+
+      ;; Point may be anywhere in the block, so move to beginning of line
+      ;; and navigate to the start of the compact block of rules.
+      (forward-line 0)
+      (while (and (not (bobp))
+                  (save-excursion (forward-line -1) (looking-at-p "^(")))
+        (forward-line -1))
+
+      ;; Rule heads are different lengths, so find the column where
+      ;; the longest one ends, while also collecting the end columns
+      ;; of all the rule heads that need to be formatted, so they can
+      ;; be formatted without re-searching.
+      (save-excursion
+        (while (and (not (eobp)) (looking-at-p "^("))
+          (forward-sexp 1)
+          (setq max-head-column (max max-head-column (current-column)))
+          (push (point) head-end-columns)
+          (forward-line 1)))
+
+      (let ((align-column (+ max-head-column dialog-tab-width))
+            ;; Shadow indent-tabs-mode to nil so that `indent-to` uses
+            ;; spaces for alignment.
+            (indent-tabs-mode nil))
+        (dolist (col head-end-columns)
+          (goto-char col)
+          (delete-horizontal-space)
+          (unless (eolp)
+            (indent-to align-column)))))))
+
+
 
 ;;; Commenting
 
