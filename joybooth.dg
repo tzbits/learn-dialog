@@ -1,0 +1,145 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% This source originally published at
+%%   https://intfiction.org/t/adjacent-to-let-s-learn-dialog-finite-switchable-game/78518
+%%
+%% Reproduced here with author's permission.
+%%
+%% This version contains the following edits by tzbits:
+%% - Add a story ifid.
+%% - Use dialog-mode.el to apply standardized formatting.
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+(story title)   The Last Joybooth Shift
+(story author)  Jason Compton
+
+(additional banner text)
+	Based on the tzbits thingo \(and A Mind Forever Voyaging\)
+
+(story release 1)
+
+(story ifid)    D793DFAD-6ACC-463D-BF93-FD8D4B535FB0
+
+(intro)
+
+	You are a joybooth operator. Your job is to push the button and provide a
+	moment of joy.
+
+	(par) Just one problem: the solar panels powering your joybooth shop are
+	almost all cracked, the boss hasn't paid the grid bills in months, and
+	people really, really need their joy.
+
+	(par)
+	(banner)
+	(try [look])
+
+(global variable (pushes left 3))
+(global variable (joybooth agitation 0))
+
+%% stolen from advent.dg
+($N percent chance)
+	(random from 0 to 99 into $X)
+	($N > $X)
+
+#button
+(name *)        button
+(descr *)       The button that activates a joybooth session.
+(#joybooth-east attracts *)
+(#joybooth-west attracts *)
+
+(perform [push *])  (pushes left $PL) (joybooth agitation $JA)
+	(if) ($PL < 1) (then) Click.
+
+	%% stolen from Craverly
+
+	(else) (current room $Room)
+		(collect $Obj)
+			*($Obj has parent $Room)
+			(is addict $Obj)
+		(into $List)
+	(if) (nonempty $List) (then) (last $List $Addict)
+		You push the button and dispense joy.
+			 ($PL minus 1 into $PLNew)
+			(now) (pushes left $PLNew)
+			(par) %% There are $PLNew pushes left.
+			($JA divided by 2 into $JANew)
+		 (now) (joybooth agitation $JANew)
+		 (now) ($Addict is nowhere)
+	 (else) No users are here and you don't want to get hooked.
+   (endif)
+   (endif)
+
+#joybooth-east
+(room *)
+(name *)        Joybooth Bank, east side
+(look *)
+	This is the east side of the joybooth shop where you work. You push the big
+	red button to activate a session.
+(from * go #west to #joybooth-west)
+
+#joybooth-west
+(room *)
+(name *)        Joybooth Bank, west side
+(look *)
+	This is the west side of the joybooth shop where you work. You push the big
+	red button to activate a session.
+(from * go #east to #joybooth-east)
+
+#prism
+(name *)        Perry Simm
+(#joybooth-east attracts *)
+(#joybooth-west attracts *)
+(proper *)
+(dict *)        perry simm sim prism man
+(male *)
+(descr *)       He seems to be passively minding his own business.
+(appearance *)  An aged man is standing here, mumbling about
+ (select) his buffer?  (or) a pearl or something.  (or) prisms? Maybe? (or)
+ simulations.
+ (purely at random)
+
+#joybooth-wanter-east
+(name *)        wanter
+(dict *)        person wanter addict patron
+(descr *)       A very eager wanter of joy.
+(is addict *)
+(appearance *)  A very eager wanter of joy is here.
+(on every tick)
+	{~(* is nowhere)} (joybooth agitation $JA) ($JA plus 1 into $JANew)
+	(now) (joybooth agitation $JANew)
+(on every tick)
+	{(* is nowhere) (33 percent chance)}
+	(now) (* is #in #joybooth-east)
+	A new patron has arrived. ~(#player is #in #joybooth-east) Elsewhere.
+
+#joybooth-wanter-west
+(name *)        addict
+(dict *)        person wanter addict patron
+(descr *)       An obvious joybooth addict.
+(is addict *)
+(appearance *)  An obvious joybooth addict is here.
+(on every tick)
+	{~(* is nowhere)} (joybooth agitation $JA) ($JA plus 1 into $JANew)
+	(now) (joybooth agitation $JANew)
+(on every tick)
+	{(* is nowhere) (33 percent chance)}
+	(now) (* is #in #joybooth-west)
+	A new patron has arrived. ~(#player is #in #joybooth-west) Elsewhere.
+
+#player
+(current player *)
+(* is #in #joybooth-east)
+(descr *)       You are a joybooth operator. It's a living.
+(on every tick)
+	(joybooth agitation $JA)
+	(if) ($JA > 8) ($JA < 16) (then)
+		The joybooth enthusiasts are starting to sound agitated. If they don't
+		get their joy, they can get ugly.
+	(endif)
+	(if) ($JA > 15) (then)
+		The addicts can't control themselves anymore and achieve a moment of
+		bliss by tearing you limb from limb. The old man just watches,
+		transfixed.
+		(game over {Your nightmare has ended.})
+	(endif)
