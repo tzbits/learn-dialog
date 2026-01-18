@@ -470,7 +470,7 @@ begin if N is 0)."
   (setq-local font-lock-defaults '(dialog-font-lock-keywords))
 
   (setq-local imenu-generic-expression
-              `((nil "^\\s-*\\(#" dialog-identifier "\\)" 1)
+              `((nil "^\\s-*\\(#[-_A-Za-z]+\\)" 1)
                 (nil "^%% \\([A-Z].*[^\n]\\)" 1)))
   (imenu-add-to-menubar "Story")
 
