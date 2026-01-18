@@ -196,19 +196,27 @@ list of `xref-item' structs."
 (defun dialog--looking-at-css-rule-p ()
   (looking-at "\\([a-z-]+\\):[ \t]*\\([^;\n]+\\);"))
 
+(defun dialog--looking-at-close-bracket-p ()
+  "Return non-nil if the character at point has close bracket syntax."
+  (let ((syntax-code (syntax-after (point))))
+    (and syntax-code
+         (= (syntax-class syntax-code) 5)))) ; 5 is the internal code for ')'
+
 (defun dialog--looking-at-rule-logic-p ()
   "Check if this is rule logic (not an inline rule call followed by story text)."
   (and (dialog--looking-at-special-p)
        (not (looking-at "(par)"))
-       (not
-        ;; an embedded rule like: (the #dog) sat.
-        (save-excursion
-          (let ((line (line-number-at-pos)))
-            (forward-sexp 1)
-            (skip-chars-forward " \t")
-            (and (= line (line-number-at-pos))
-                 (not (dialog--looking-at-special-p))
-                 (not (eolp))))))))
+       (or
+        (dialog--looking-at-close-bracket-p)
+        (not
+         ;; an embedded rule like: (the #dog) sat.
+         (save-excursion
+           (let ((line (line-number-at-pos)))
+             (forward-sexp 1)
+             (skip-chars-forward " \t")
+             (and (= line (line-number-at-pos))
+                  (not (dialog--looking-at-special-p))
+                  (not (eolp)))))))))
 
 (defun dialog-fill-paragraph (&optional justify)
   "Fill the current paragraph.
@@ -227,6 +235,8 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
               (fill-region start end justify)
             (fill-region-as-paragraph start end justify))))))))
 
+;; TODO: this needs to be refactored to use a new function
+;;    dialog--looking-at-start-of-paragraph-p
 (defun dialog-beginning-of-paragraph ()
   "Move point to the beginning of the current Dialog paragraph."
   (interactive)
@@ -255,6 +265,8 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
           (back-to-indentation)
           (throw 'done t))))))
 
+;; TODO: this needs to be refactored to use a new function
+;;    dialog--looking-at-end-of-paragraph-p
 (defun dialog-end-of-paragraph ()
   "Move point to the end of the current Dialog paragraph."
   (interactive)
