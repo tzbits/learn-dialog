@@ -18,7 +18,9 @@ one of these mechanics, I'm also happy to link it as an example.
 I've tried to keep implementations minimal focusing on the prompt
 mechanics, and if I go beyond the prompt, I try to stick to the
 mechanics found in [Cloak of
-Darkness](https://linusakesson.net/dialog/cloak/cloak-rel1.dg).
+Darkness](https://linusakesson.net/dialog/cloak/cloak-rel1.dg)
+or mechanics used in previous prompts.
+
 
 ## 1. The Room Evolution Game
 
@@ -40,14 +42,11 @@ Examples:
   Christian Andersen, by tzbits.
 
 - [christmas.dg](./christmas.dg)
-  \[[Play Now](https://tzbits.com/dialog/christmas/)\]
-  \[[discussion](https://intfiction.org/t/lets-learn-dialog/78444/10)\]:
-  All the Days of Christmas In This Room, by Jason Compton, with
-  edits by tzbits to count down the days using recursion.
+  \[[Play Now](https://tzbits.com/dialog/christmas/)\]:
+  All the Days of Christmas In This Room, by Jason Compton.
 
 - [snowable.dg](./snowable.dg)
-  \[[Play Now](https://tzbits.com/dialog/snowable/)\]
-  \[[discussion](https://intfiction.org/t/lets-learn-dialog/78444/16)\]:
+  \[[Play Now](https://tzbits.com/dialog/snowable/)\]:
   Snowable by Adam Biltcliffe
 
 
@@ -67,6 +66,7 @@ Examples:
   \[[Play  Now](https://tzbits.com/dialog/lantern/)\]:
   Candle Lantern by tzbits.
 
+
 ## 3. The Attracts Game
 
 The Attracts Game: Use `($Room attracts $Obj)` to make something
@@ -79,12 +79,12 @@ the object to be manually moved between rooms.
 
 Examples:
 
-* [The Last Joybooth
-  Shift](https://intfiction.org/t/adjacent-to-let-s-learn-dialog-finite-switchable-game/78518),
-  by Jason Compton
+* [joybooth.dg](./joybooth.dg)
+  \[[Play Now](https://tzbits.com/dialog/joybooth)]\
+  The Last Joybooth by Jason Compton
 * [chiaroscuro.dg](chiaroscuro.dg)
   \[[Play Now](https://tzbits.com/dialog/chiaroscuro/)\]:
-  Chiaroscuro Chamber
+  Chiaroscuro Chamber by tzbits
 
 
 ## 4. More to come

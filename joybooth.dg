@@ -1,3 +1,16 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% This source originally published at
+%%   https://intfiction.org/t/adjacent-to-let-s-learn-dialog-finite-switchable-game/78518
+%%
+%% Reproduced here with author's permission.
+%%
+%% This version contains the following edits by tzbits:
+%% - Add a story ifid.
+%% - Use dialog-mode.el to apply standardized formatting.
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 (story title)   The Last Joybooth Shift
 (story author)  Jason Compton
 
@@ -6,7 +19,7 @@
 
 (story release 1)
 
-(story ifid)    2031-2041-2051-2061-2071-2081
+(story ifid)    D793DFAD-6ACC-463D-BF93-FD8D4B535FB0
 
 (intro)
 
@@ -38,7 +51,7 @@
 (perform [push *])  (pushes left $PL) (joybooth agitation $JA)
 	(if) ($PL < 1) (then) Click.
 
-%% stolen from Craverly
+	%% stolen from Craverly
 
 	(else) (current room $Room)
 		(collect $Obj)
