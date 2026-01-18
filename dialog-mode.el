@@ -199,16 +199,16 @@ list of `xref-item' structs."
 (defun dialog--looking-at-rule-logic-p ()
   "Check if this is rule logic (not an inline rule call followed by story text)."
   (and (dialog--looking-at-special-p)
-       (or (not (looking-at "("))
-           (not
-            ;; an embedded rule like: (par) The dog sat.
-            (save-excursion
-              (let ((line (line-number-at-pos)))
-                (forward-sexp 1)
-                (skip-chars-forward " \t")
-                (and (= line (line-number-at-pos))
-                     (not (dialog--looking-at-special-p))
-                     (not (eolp)))))))))
+       (not (looking-at "(par)"))
+       (not
+        ;; an embedded rule like: (the #dog) sat.
+        (save-excursion
+          (let ((line (line-number-at-pos)))
+            (forward-sexp 1)
+            (skip-chars-forward " \t")
+            (and (= line (line-number-at-pos))
+                 (not (dialog--looking-at-special-p))
+                 (not (eolp))))))))
 
 (defun dialog-fill-paragraph (&optional justify)
   "Fill the current paragraph.
@@ -219,9 +219,10 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
    ((dialog--looking-at-compact-rules-p) (dialog-align-compact-rules))
    (t
     (save-excursion
-      (let ((start (progn (dialog-beginning-of-paragraph) (point)))
-            (end (progn (dialog-end-of-paragraph) (point))))
-        (when (/= (line-number-at-pos start) (line-number-at-pos end))
+      (let ((end (progn (dialog-end-of-paragraph) (point)))
+            (start (progn (dialog-beginning-of-paragraph) (point))))
+        (when (or (not (dialog--looking-at-rule-logic-p))
+                  (/= (line-number-at-pos start) (line-number-at-pos end)))
           (if (save-excursion (goto-char start) (dialog--looking-at-comment-p))
               (fill-region start end justify)
             (fill-region-as-paragraph start end justify))))))))
