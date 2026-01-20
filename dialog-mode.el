@@ -57,6 +57,120 @@
 (rx-define dialog-identifier
   (1+ (or (syntax word) (any "-_+"))))
 
+;; TODO: add font-lock entries for more complicated cases that involve
+;;     more terms (which often end with 'into').
+(rx-define dialog-infix-keyword-phrase
+  (or
+   "divided by"
+   "has parent"
+   "is one of"
+   "minus"
+   "modulo"
+   "plus"
+   "times"))
+
+(rx-define dialog-keywords
+  (or
+   "accumulate"
+   "append"
+   "at random"
+   "bold"
+   "bound"
+   "breakpoint"
+   "clear all"
+   "clear div"
+   "clear links"
+   "clear old"
+   "clear"
+   "collect words"
+   "collect"
+   "compiler version"
+   "cycling"
+   "define resource"
+   "determine object"
+   "div"
+   "else"
+   "elseif"
+   "embed resource"
+   "empty"
+   "endif"
+   "error"
+   "exhaust"
+   "fail"
+   "fixed pitch"
+   "from words"
+   "fully bound"
+   "generate"
+   "get input"
+   "get key"
+   "global variable"
+   "if"
+   "inline status bar"
+   "interface"
+   "interpreter can embed"
+   "interpreter supports"
+   "interpreter"
+   "into"
+   "italic"
+   "join words"
+   "just"
+   "library version"
+   "line"
+   "link resource"
+   "link"
+   "list"
+   "log"
+   "matching all of"
+   "no space"
+   "nonempty"
+   "now"
+   "number"
+   "object"
+   "or"
+   "par"
+   "program entry point"
+   "progress bar"
+   "purely at randme"
+   "quit"
+   "random from"
+   "removable word endings"
+   "repeat forever"
+   "restart"
+   "restore"
+   "reverse"
+   "roman"
+   "save undo"
+   "save"
+   "script off"
+   "script on"
+   "select"
+   "serial number"
+   "space"
+   "span"
+   "split word"
+   "split"
+   "status bar"
+   "stop"
+   "stoppable"
+   "stopping"
+   "story author"
+   "story blurb"
+   "story ifid"
+   "story noun"
+   "story release"
+   "story title"
+   "style class"
+   "then at random"
+   "then purely at random"
+   "then"
+   "trace off"
+   "trace on"
+   "undo"
+   "unknown word"
+   "unstyle"
+   "uppercase"
+   "word"))
+
 (defcustom dialog-tab-width 4
   "Default tab width for Dialog files."
   :type 'integer
@@ -81,11 +195,17 @@
 (defconst dialog-font-lock-keywords
   (list
    (list (rx "#" dialog-identifier) 0 'font-lock-constant-face)
-   (list (rx "@" dialog-identifier) 0 'font-lock-keyword-face)
+   (list (rx "@" dialog-identifier) 0 'font-lock-constant-face)
    (list (rx "$" dialog-identifier) 0 'font-lock-variable-name-face)
 
    ;; Highlight only group 1 to prevent the parenthesis from being
    ;; colored as part of the function name.
+   (list (rx "(" (or (seq "#" dialog-identifier)
+                     (seq "@" dialog-identifier)
+                     (seq "$" dialog-identifier))
+             (+ space)
+             (group-n 1 dialog-infix-keyword-phrase)) 1 'font-lock-keyword-face)
+   (list (rx "(" (group-n 1 dialog-keywords)) 1 'font-lock-keyword-face)
    (list (rx "(" (group-n 1 dialog-identifier)) 1 'font-lock-function-name-face))
   "Keyword highlighting specification for `dialog-mode'.")
 
