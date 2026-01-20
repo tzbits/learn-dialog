@@ -54,6 +54,33 @@
   :group 'languages
   :prefix "dialog-")
 
+(defcustom dialog-tab-width 4
+  "Default tab width for Dialog files."
+  :type 'integer
+  :group 'dialog)
+
+(defcustom dialog-fill-column 79
+  "Default fill column for Dialog prose."
+  :type 'integer
+  :group 'dialog)
+
+(defcustom dialog-ignored-directories '("out")
+  "List of directory names to ignore when searching for definitions."
+  :type '(repeat string)
+  :group 'dialog)
+
+(defvar-keymap dialog-mode-map
+  :doc "Keymap for `dialog-mode'."
+  "M-q" 'dialog-fill-paragraph
+  "C-c C-;" 'dialog-insert-comment-divider
+  "C-c C-f" 'dialog-format-buffer
+  "M-}" 'dialog-end-of-paragraph
+  "M-{" 'dialog-beginning-of-paragraph)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Font lock
+
 (rx-define dialog-identifier
   (1+ (or (syntax word) (any "-_+"))))
 
@@ -171,26 +198,17 @@
    "uppercase"
    "word"))
 
-(defcustom dialog-tab-width 4
-  "Default tab width for Dialog files."
-  :type 'integer
-  :group 'dialog)
+(rx-define dialog-special-symbol
+  (or (seq "#" dialog-identifier)
+      (seq "@" dialog-identifier)
+      (seq "$" dialog-identifier)))
 
-(defcustom dialog-fill-column 79
-  "Default fill column for Dialog prose."
-  :type 'integer
-  :group 'dialog)
+(rx-define dialog-multi-word-builtin
+  (seq "(" dialog-special-symbol
+       (+ space) (group-n 1 dialog-infix-keyword-phrase)))
 
-(defcustom dialog-ignored-directories '("out")
-  "List of directory names to ignore when searching for definitions."
-  :type '(repeat string)
-  :group 'dialog)
-
-(defvar-keymap dialog-mode-map
-  :doc "Keymap for `dialog-mode'."
-  "M-q" 'dialog-fill-paragraph
-  "C-c C-;" 'dialog-insert-comment-divider
-  "C-c C-f" 'dialog-format-buffer)
+(rx-define dialog-single-word-builtin
+  (seq "(" (group-n 1 dialog-keywords)))
 
 (defconst dialog-font-lock-keywords
   (list
@@ -200,12 +218,8 @@
 
    ;; Highlight only group 1 to prevent the parenthesis from being
    ;; colored as part of the function name.
-   (list (rx "(" (or (seq "#" dialog-identifier)
-                     (seq "@" dialog-identifier)
-                     (seq "$" dialog-identifier))
-             (+ space)
-             (group-n 1 dialog-infix-keyword-phrase)) 1 'font-lock-keyword-face)
-   (list (rx "(" (group-n 1 dialog-keywords)) 1 'font-lock-keyword-face)
+   (list (rx dialog-multi-word-builtin) 1 'font-lock-keyword-face)
+   (list (rx dialog-single-word-builtin) 1 'font-lock-keyword-face)
    (list (rx "(" (group-n 1 dialog-identifier)) 1 'font-lock-function-name-face))
   "Keyword highlighting specification for `dialog-mode'.")
 
@@ -240,6 +254,8 @@
 
     table)
   "Syntax table for `dialog-mode'.")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Xref Backend Implementation
 
@@ -304,125 +320,9 @@ list of `xref-item' structs."
            (string= (buffer-substring (- (point) prefix-len) (point))
                     prefix)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;; Paragraph Handling
-
-(defun dialog--looking-at-special-p ()
-  "Check if point is at a Dialog special character sequence."
-  (looking-at-p (rx (any "#$@~*|([{} "))))
-
-(defun dialog--looking-at-comment-p ()
-  (looking-at-p "%%"))
-
-(defun dialog--looking-at-css-rule-p ()
-  (looking-at "\\([a-z-]+\\):[ \t]*\\([^;\n]+\\);"))
-
-(defun dialog--looking-at-close-bracket-p ()
-  "Return non-nil if the character at point has close bracket syntax."
-  (let ((syntax-code (syntax-after (point))))
-    (and syntax-code
-         (= (syntax-class syntax-code) 5)))) ; 5 is the internal code for ')'
-
-(defun dialog--looking-at-rule-logic-p ()
-  "Check if this is rule logic (not an inline rule call followed by story text)."
-  (and (dialog--looking-at-special-p)
-       (not (looking-at "(par)"))
-       (or
-        (dialog--looking-at-close-bracket-p)
-        (not
-         ;; an embedded rule like: (the #dog) sat.
-         (save-excursion
-           (let ((line (line-number-at-pos)))
-             (forward-sexp 1)
-             (skip-chars-forward " \t")
-             (and (= line (line-number-at-pos))
-                  (not (dialog--looking-at-special-p))
-                  (not (eolp)))))))))
-
-(defun dialog-fill-paragraph (&optional justify)
-  "Fill the current paragraph.
-JUSTIFY is passed to `fill-region-as-paragraph'."
-  (interactive "P")
-  (cond
-   ((save-excursion (back-to-indentation) (looking-at-p "\\s-*$")))
-   ((dialog--looking-at-compact-rules-p) (dialog-align-compact-rules))
-   (t
-    (save-excursion
-      (let ((end (progn (dialog-end-of-paragraph) (point)))
-            (start (progn (dialog-beginning-of-paragraph) (point))))
-        (when (or (not (dialog--looking-at-rule-logic-p))
-                  (/= (line-number-at-pos start) (line-number-at-pos end)))
-          (if (save-excursion (goto-char start) (dialog--looking-at-comment-p))
-              (fill-region start end justify)
-            (fill-region-as-paragraph start end justify))))))))
-
-;; TODO: this needs to be refactored to use a new function
-;;    dialog--looking-at-start-of-paragraph-p
-(defun dialog-beginning-of-paragraph ()
-  "Move point to the beginning of the current Dialog paragraph."
-  (interactive)
-  (back-to-indentation)
-  (let ((col (current-column)))
-    (catch 'done
-
-      (when (dialog--looking-at-comment-p)
-        (dialog--beginning-of-comment)
-        (throw 'done t))
-
-      (when (dialog--looking-at-css-rule-p)
-        (throw 'done t))
-
-      (when (dialog--looking-at-rule-logic-p)
-        (throw 'done t))
-
-      (while (and (not (bobp))
-                  (= (dialog--get-previous-indent) col))
-        (forward-line -1)
-        (back-to-indentation)
-        (when (looking-at-p "(par)")
-          (throw 'done t))
-        (when (dialog--looking-at-rule-logic-p)
-          (forward-line 1)
-          (back-to-indentation)
-          (throw 'done t))))))
-
-;; TODO: this needs to be refactored to use a new function
-;;    dialog--looking-at-end-of-paragraph-p
-(defun dialog-end-of-paragraph ()
-  "Move point to the end of the current Dialog paragraph."
-  (interactive)
-  (back-to-indentation)
-  (let ((col (current-column)))
-    (catch 'done
-
-      (when (dialog--looking-at-comment-p)
-        (dialog--end-of-comment)
-        (throw 'done t))
-
-      (when (dialog--looking-at-css-rule-p)
-        (end-of-line)
-        (throw 'done t))
-
-      (when (looking-at-p "\\s-*$")
-        (throw 'done t))
-
-      (when (dialog--looking-at-rule-logic-p)
-        (end-of-line)
-        (throw 'done t))
-
-      (while (and (not (eobp))
-                  (= (dialog--get-next-indent) col)
-                  (not (dialog--looking-at-rule-logic-p))
-                  (not (save-excursion
-                         (forward-line 1)
-                         (back-to-indentation)
-                         (looking-at-p "\\s-*$"))))
-        (forward-line 1)
-        (back-to-indentation)
-        (when (dialog--looking-at-rule-logic-p)
-          (forward-line -1)
-          (end-of-line)
-          (throw 'done t)))))
-  (end-of-line))
 
 (defun dialog--get-previous-indent ()
   "Get the indentation of the previous line."
@@ -437,6 +337,122 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
     (if (zerop (forward-line 1))
         (progn (back-to-indentation) (current-column))
       -1)))
+
+(defun dialog--looking-at-comment-p ()
+  (looking-at-p "%%"))
+
+(defun dialog--looking-at-css-rule-p ()
+  (looking-at "\\([a-z-]+\\):[ \t]*\\([^;\n]+\\);"))
+
+(defun dialog--looking-at-close-bracket-p ()
+  "Return non-nil if the character at point has close bracket syntax."
+  (let ((syntax-code (syntax-after (point))))
+    (and syntax-code
+         (= (syntax-class syntax-code) 5))))
+
+(defun dialog--looking-at-special-p ()
+  "Check if point is at a Dialog special character sequence."
+  (looking-at-p (rx (any "#$@~*|([{} ")))) ; 5 is the internal code for ')'
+
+(defun dialog--looking-at-builtin-p ()
+  (and (looking-at "\(")
+       (or
+        (looking-at (rx dialog-multi-word-builtin))
+        (looking-at (rx dialog-single-word-builtin)))))
+
+(defun dialog--looking-at-empty-line-p ()
+  (looking-at "^\\s-*$"))
+
+(defun dialog--looking-at-special-p ()
+  "Check if point is at a Dialog special character sequence."
+  (looking-at-p (rx (any "#$@~*|([{} "))))
+
+(defun dialog--looking-at-paragraph-begin-p ()
+  (save-excursion
+    (back-to-indentation)
+    (or (= (current-column) 0)
+        (/= (dialog--get-previous-indent) (current-column))
+        (save-excursion
+          (forward-line -1) (forward-line 0) (dialog--looking-at-empty-line-p))
+        (dialog--looking-at-css-rule-p)
+        (dialog--looking-at-close-bracket-p)
+        (dialog--looking-at-builtin-p)
+        (not (dialog--line-has-story-text-p)))))
+
+(defun dialog--looking-at-paragraph-end-p ()
+  (save-excursion
+    (back-to-indentation)
+    (or (= (current-column) 0)
+        (save-excursion (end-of-line) (eobp))
+        (/= (dialog--get-next-indent) (current-column))
+        (save-excursion
+          (forward-line 1) (forward-line 0) (dialog--looking-at-empty-line-p))
+        (save-excursion
+          (forward-line 1) (or (eobp) (dialog--looking-at-paragraph-begin-p))))))
+
+(defun dialog-beginning-of-paragraph ()
+  "Move point to the beginning of the current Dialog paragraph."
+  (interactive)
+  (let ((col (current-column)))
+    (back-to-indentation)
+    (when (and (= col (current-column)) (not (bobp)))
+      (forward-line -1)
+      (back-to-indentation))
+    (while (not (or (bobp) (dialog--looking-at-paragraph-begin-p)))
+      (forward-line -1)
+      (back-to-indentation))))
+
+(defun dialog-end-of-paragraph ()
+  "Move point to the end of the current Dialog paragraph."
+  (interactive)
+  (when (and (eolp) (not (eobp)))
+    (forward-line 1))
+  (end-of-line)
+  (while (not (or (eobp) (dialog--looking-at-paragraph-end-p)))
+    (forward-line 1)
+    (end-of-line)))
+
+(defun dialog--skip-form-on-line ()
+  (when (dialog--looking-at-special-p)
+    (cond ((eq (char-syntax (char-after)) ?\)) (forward-char 1))
+          (t (forward-sexp 1)))
+    (skip-chars-forward " \t")))
+
+(defun dialog--line-has-story-text-p ()
+  (save-excursion
+    (back-to-indentation)
+    (let ((lineno (line-number-at-pos)))
+      (while (and (dialog--looking-at-special-p)
+                  (= (line-number-at-pos) lineno))
+        (dialog--skip-form-on-line))
+      (and (not (eolp))
+           (= (line-number-at-pos) lineno)))))
+
+(defun dialog--allow-fill-paragraph (start end)
+  (save-excursion
+    (goto-char start)
+    (or (dialog--looking-at-comment-p)
+        (looking-at "(par)")
+        (looking-at "(line)")
+        (and (not (dialog--looking-at-builtin-p))
+             (dialog--line-has-story-text-p)))))
+
+(defun dialog-fill-paragraph (&optional justify)
+  "Fill the current paragraph.
+JUSTIFY is passed to `fill-region-as-paragraph'."
+  (interactive "P")
+  (cond ((dialog--looking-at-empty-line-p))
+        ((dialog--looking-at-compact-rules-p) (dialog-align-compact-rules))
+        (t
+         (save-excursion
+           (beginning-of-line)
+           (let ((end (progn (dialog-end-of-paragraph) (point)))
+                 (start (progn (dialog-beginning-of-paragraph) (point))))
+             (when (dialog--allow-fill-paragraph start end)
+               (if (dialog--looking-at-comment-p)
+                   (fill-region start end justify)
+                 (fill-region-as-paragraph start end justify))))))))
+
 
 ;;; Compact Rules
 
