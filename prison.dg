@@ -64,7 +64,9 @@
 	If only you could find something to dig with.
 
 (instead of [go #up])
-	~(current room *)
+	(current room $Room)
+	(from $Room go #up to $Dest)
+	~($Dest = *)
 	(depth $depth)
 	($depth = 0)
 	Your spoon breaks through to daylight. You poke your head out of the
