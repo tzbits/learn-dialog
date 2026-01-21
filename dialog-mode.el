@@ -377,7 +377,11 @@ list of `xref-item' structs."
         (dialog--looking-at-css-rule-p)
         (dialog--looking-at-close-bracket-p)
         (dialog--looking-at-builtin-p)
-        (not (dialog--line-has-story-text-p)))))
+        (not (dialog--line-has-story-text-p))
+        (and (dialog--line-has-story-text-p)
+             (save-excursion
+               (forward-line -1) (forward-line 0)
+               (not (dialog--line-has-story-text-p)))))))
 
 (defun dialog--looking-at-paragraph-end-p ()
   (save-excursion
@@ -453,8 +457,11 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
                    (fill-region start end justify)
                  (fill-region-as-paragraph start end justify))))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Compact Rules
+
+;;; TODO: need to handle alignment of end of line comments as a third column.
 
 (defun dialog--looking-at-compact-rules-p ()
   "Return non-nil if point is in a block of compact rules."
@@ -508,6 +515,8 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
         (+ stop dialog-tab-width)
       stop)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;; Format buffer
 
 (defun dialog-format-buffer ()
@@ -540,6 +549,7 @@ JUSTIFY is passed to `fill-region-as-paragraph'."
         (unless (eobp)
           (forward-line 1)))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Commenting
 
@@ -581,6 +591,10 @@ begin if N is 0)."
     (insert-char ?% dialog-fill-column)
     (unless blank-on
       (open-line 2))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; dialog-mode
 
 ;;;###autoload
 (define-derived-mode dialog-mode text-mode "Dialog"
