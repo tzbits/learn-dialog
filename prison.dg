@@ -37,8 +37,8 @@
 
 #prison-cell
 (room *)
-(dig node *)
-(starting dig node *)
+(dig-node *)
+(starting-dig-node *)
 (name *)        prison cell
 (heads *)       cell
 (look *)        The prison cell has four walls and seemingly no way out.
@@ -63,96 +63,68 @@
 	~(#spoon is #heldby #player)
 	If only you could find something to dig with.
 
-(instead of [go #up])
-	(current room $Room)
-	(from $Room go #up to $Dest)
-	~($Dest = *)
-	(depth $depth)
-	($depth = 0)
-	Your spoon breaks through to daylight. You poke your head out of the
-	tunnel.
-	(par) There is a prison guard here.
-	(par) He takes you back to prison.
-	(game over { Game Over. })
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+(flip [#north #south])
+(flip [#south #north])
+(flip [#east #west])
+(flip [#west #east])
+(flip [#up #down])
+(flip [#down #up])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-(interface (tunnel $<A north to $B))
-(interface (tunnel $<A south to $B))
-(interface (tunnel $<A east to $B))
-(interface (tunnel $<A west to $B))
-(interface (tunnel $<A up to $B))
-(interface (tunnel $<A down to $B))
+(global variable (tunnel-list []))
 
-(interface (tunnel $<A $B))
+(tunnel $Room $Dir $Dest)
+	(tunnel-list $List)
+	(tunnel-search $Room $Dir $Dest $List)
 
-(tunnel $A $B)
-	(dig node $A)
-	(dig node $B)
-	{
-		(tunnel $A north to $B)
-		(or) (tunnel $A south to $B)
-		(or) (tunnel $A east to $B)
-		(or) (tunnel $A west to $B)
-		(or) (tunnel $A up to $B)
-		(or) (tunnel $A down to $B)
-	}
+(tunnel-search $Room $Dir $Dest $List)
+	([$Room $Dir $Dest | $Tail] = $List)
+	(or) { ([$ $ $ | $Tail] = $List) (tunnel-search $Room $Dir $Dest $Tail) }
 
 (excavated $Room)
-	(from $Room go $ to $)
+	(tunnel $Room $ $) (or) (tunnel $ $ $Room)
 
-(fully excavated $Room)
-	(starting dig node $Room)
-	(from $Room go $ to $B)
-	(from $B go $ to $Room)
+(fully-excavated $Room)
+	(starting-dig-node $Room)
+	(tunnel $Room $ $)
 
-(fully excavated $Room)
-	(collect $Dir)
-		*(from $Room go $Dir to $)
-	(into $List)
-	($List = [$ | $Rest])
-	~($Rest = [])
+(fully-excavated $Room)
+	(tunnel $Room $ $)
+	(tunnel $ $ $Room)
 
-(from $A go #east to $B)
-	(tunnel $A east to $B)
-
-(from $A go #west to $B)
-	(tunnel $A west to $B)
-
-(from $A go #north to $B)
-	(tunnel $A north to $B)
-
-(from $A go #south to $B)
-	(tunnel $A south to $B)
-
-(from $A go #down to $B)
-	(tunnel $A down to $B)
-
-(from $A go #up to $B)
-	(tunnel $A up to $B)
+(from $A go $Dir to $B)
+	(dig-node $A)
+	(tunnel $A $Dir $B)
+	(or) { (flip [$Dir $Back]) (tunnel $B $Back $A) }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-(generate 6 (dig node $))
+(generate 6 (dig-node $))
 
-(room *(dig node $))
+(room *(dig-node $))
 (name $Room)
-	(dig node $Room)
+	(dig-node $Room)
 	tunnel
 
 (look $Room)
-	(dig node $Room)
-	You are in a small spoon-dug tunnel. The tunnel continues
-	(exhaust) {
-		*(from $Room go $Dir to $)
-		(name $Dir)
-	}.
+	(dig-node $Room)
+	You are in a small spoon-dug tunnel.
+	(if) (tunnel $Room $Dir1 $) (then)
+		The tunnel continues (name $Dir1).
+	(endif)
+	(if) (tunnel $ $Dir2 $Room) (then)
+		(flip [$Dir2 $Back])
+		(Name $Back) leads back.
+	(endif)
 
-(interface (unused dig nodes $>List))
+(interface (unused-dig-nodes $>List))
 
-(unused dig nodes $List)
+(unused-dig-nodes $List)
 	(collect $Node)
-		*(dig node $Node) ~(starting dig node $Node) ~(excavated $Node)
+		*(dig-node $Node) ~(starting-dig-node $Node) ~(excavated $Node)
 	(into $List)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -166,41 +138,34 @@
 
 (prevent [dig $])
 	(current room $Room)
-	(fully excavated $Room)
+	(fully-excavated $Room)
 	You already dug here.
 
 (perform [dig $Dir])
-	(unused dig nodes [])
+	(unused-dig-nodes [])
 	You try digging (name $Dir), but hit a wall of rock that prevents further
 	progress.
 
 (perform [dig $Dir])
 	(current room $Room)
-	(unused dig nodes $Unused)
-	($Unused = [$NextRoom | $])
-	(if) ($Dir = #north) (then)
-		(now) (tunnel $Room north to $NextRoom)
-		(now) (tunnel $NextRoom south to $Room)
-	(elseif) ($Dir = #south) (then)
-		(now) (tunnel $Room south to $NextRoom)
-		(now) (tunnel $NextRoom north to $Room)
-	(elseif) ($Dir = #east) (then)
-		(now) (tunnel $Room east to $NextRoom)
-		(now) (tunnel $NextRoom west to $Room)
-	(elseif) ($Dir = #west) (then)
-		(now) (tunnel $Room west to $NextRoom)
-		(now) (tunnel $NextRoom east to $Room)
-	(elseif) ($Dir = #up) (then)
-		(now) (tunnel $Room up to $NextRoom)
-		(now) (tunnel $NextRoom down to $Room)
-	(elseif) ($Dir = #down) (then)
-		(now) (tunnel $Room down to $NextRoom)
-		(now) (tunnel $NextRoom up to $Room)
-	(else)
-		(fail)
-	(endif)
+	(unused-dig-nodes $Unused)
+	([$Dest | $] = $Unused)
+	(tunnel-list $TunnelList)
+	(now) (tunnel-list [$Room $Dir $Dest | $TunnelList])
 	Determined to escape, you begin digging with the spoon, and slowly extend
 	the tunnel (name $Dir).
+
+(instead of [go #up])
+	(current room $Room)
+	(from $Room go #up to $Dest)
+	~(starting-dig-node $Dest)
+	(depth $depth)
+	($depth = 0)
+	Your spoon breaks through to daylight. You poke your head out of the
+	tunnel.
+	(par) There is a prison guard here.
+	(par) He takes you back to prison.
+	(game over { Game Over. })
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
